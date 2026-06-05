@@ -4,6 +4,7 @@ import secrets
 import requests
 from dotenv import load_dotenv
 from flask import Flask, redirect, request, session
+from spotify import build_feature_matrix
 
 # Load the credentials from your .env file
 load_dotenv()
@@ -73,11 +74,35 @@ def callback():
     session["access_token"]  = tokens["access_token"]
     session["refresh_token"] = tokens["refresh_token"]
 
+    # Fetch the feature matrix right after login
+    matrix = build_feature_matrix(session["access_token"])
+
+    # Show the first 5 tracks so we can verify it's working
+    preview = ""
+    for track in matrix[:5]:
+        preview += f"""
+            <tr>
+                <td>{track['name']}</td>
+                <td>{track['artist']}</td>
+                <td>{track['valence']:.2f}</td>
+                <td>{track['energy']:.2f}</td>
+                <td>{track['danceability']:.2f}</td>
+                <td>{int(track['tempo'])} BPM</td>
+            </tr>
+        """
+
     return f"""
-        <h2>Auth successful!</h2>
-        <p><b>Access token:</b> {tokens['access_token'][:40]}...</p>
-        <p><b>Expires in:</b> {tokens['expires_in']} seconds</p>
-        <p><b>Refresh token:</b> {tokens['refresh_token'][:40]}...</p>
+        <h2>✅ Auth + data fetch successful!</h2>
+        <p>Pulled <b>{len(matrix)}</b> tracks with audio features.</p>
+        <table border="1" cellpadding="8">
+            <tr>
+                <th>Track</th><th>Artist</th>
+                <th>Valence 😊</th><th>Energy ⚡</th>
+                <th>Danceability 💃</th><th>Tempo</th>
+            </tr>
+            {preview}
+        </table>
+        <p><i>Showing first 5 of {len(matrix)} tracks.</i></p>
     """
 
 
