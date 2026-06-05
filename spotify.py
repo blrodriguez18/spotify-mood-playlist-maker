@@ -1,51 +1,41 @@
 import requests
+import os
 import json
+import time
+from dotenv import load_dotenv
 
-# Every Spotify API call needs this base URL
-BASE_URL = "https://api.spotify.com/v1"
+load_dotenv()
+
+BASE_URL      = "https://api.spotify.com/v1"
+LASTFM_KEY    = os.getenv("LASTFM_API_KEY")
+LASTFM_BASE   = "http://ws.audioscrobbler.com/2.0/"
 
 
 def get_headers(access_token):
-    """Build the auth header required by every Spotify API request."""
     return {"Authorization": f"Bearer {access_token}"}
 
 
-# ── 1. Get the user's top tracks ─────────────────────────────────────
+# ── Spotify: get top tracks ───────────────────────────────────────────
 def get_top_tracks(access_token, time_range="short_term", limit=50):
-    """
-    Fetch the user's most-listened-to tracks.
-    time_range options:
-      - short_term  = last 4 weeks
-      - medium_term = last 6 months
-      - long_term   = all time
-    """
     url = f"{BASE_URL}/me/top/tracks"
     params = {"time_range": time_range, "limit": limit}
-
     response = requests.get(url, headers=get_headers(access_token), params=params)
     data = response.json()
 
-    # Pull out just the fields we care about from each track
     tracks = []
     for item in data.get("items", []):
         tracks.append({
             "id":     item["id"],
             "name":   item["name"],
-            "artist": item["artists"][0]["name"],  # just the first artist
+            "artist": item["artists"][0]["name"],
         })
-
     return tracks
 
 
-# ── 2. Get recently played tracks ────────────────────────────────────
+# ── Spotify: get recently played ─────────────────────────────────────
 def get_recently_played(access_token, limit=50):
-    """
-    Fetch the last N tracks the user played.
-    This is great for detecting *current* mood.
-    """
     url = f"{BASE_URL}/me/player/recently-played"
     params = {"limit": limit}
-
     response = requests.get(url, headers=get_headers(access_token), params=params)
     data = response.json()
 
@@ -57,46 +47,40 @@ def get_recently_played(access_token, limit=50):
             "name":   track["name"],
             "artist": track["artists"][0]["name"],
         })
-
     return tracks
 
 
-# ── 3. Get audio features for a list of tracks ───────────────────────
-def get_audio_features(access_token, track_ids):
+# ── Last.fm: get mood tags for one track ─────────────────────────────
+def get_lastfm_tags(track_name, artist_name):
     """
-    Fetch Spotify's audio analysis for up to 100 tracks at once.
-    This returns the ML features we'll use: valence, energy, etc.
+    Fetch crowd-sourced tags for a track from Last.fm.
+    Tags look like: ['sad', 'indie', 'rainy day', 'chill', 'melancholic']
+    We'll use these as mood signals in Phase 3.
     """
-    url = f"{BASE_URL}/audio-features"
-    # Spotify expects a comma-separated string of IDs
-    params = {"ids": ",".join(track_ids)}
+    params = {
+        "method":  "track.getTopTags",
+        "track":   track_name,
+        "artist":  artist_name,
+        "api_key": LASTFM_KEY,
+        "format":  "json",
+    }
+    try:
+        response = requests.get(LASTFM_BASE, params=params, timeout=5)
+        data = response.json()
 
-    response = requests.get(url, headers=get_headers(access_token), params=params)
-    data = response.json()
+        tags = []
+        for tag in data.get("toptags", {}).get("tag", [])[:8]:
+            # Each tag has a 'count' (how many people tagged it) — only keep strong ones
+            if int(tag.get("count", 0)) > 10:
+                tags.append(tag["name"].lower())
+        return tags
 
-    features = []
-    for item in data.get("audio_features", []):
-        if item is None:
-            continue  # occasionally Spotify returns null for a track — skip it
-        features.append({
-            "id":             item["id"],
-            "valence":        item["valence"],        # 0=sad, 1=happy
-            "energy":         item["energy"],         # 0=calm, 1=intense
-            "danceability":   item["danceability"],   # 0=stiff, 1=danceable
-            "tempo":          item["tempo"],          # BPM
-            "acousticness":   item["acousticness"],   # 0=electric, 1=acoustic
-            "speechiness":    item["speechiness"],    # 0=music, 1=spoken word
-        })
-
-    return features
+    except Exception:
+        return []  # if Last.fm doesn't know the track, just return empty
 
 
-# ── 4. Combine tracks + features into one dataset ────────────────────
+# ── Master function ───────────────────────────────────────────────────
 def build_feature_matrix(access_token):
-    """
-    Master function: pulls top tracks + recent plays, deduplicates,
-    fetches audio features, and returns one combined list of dicts.
-    """
     print("Fetching top tracks (short term)...")
     top_short  = get_top_tracks(access_token, time_range="short_term")
 
@@ -106,33 +90,33 @@ def build_feature_matrix(access_token):
     print("Fetching recently played...")
     recent     = get_recently_played(access_token)
 
-    # Merge all three lists and deduplicate by track ID
+    # Deduplicate by Spotify track ID
     all_tracks = {t["id"]: t for t in top_short + top_medium + recent}
     unique_tracks = list(all_tracks.values())
     print(f"Total unique tracks: {len(unique_tracks)}")
 
-    # Spotify's audio-features endpoint handles max 100 IDs at once
-    # so we split into chunks if needed
-    track_ids = [t["id"] for t in unique_tracks]
-    all_features = []
-    for i in range(0, len(track_ids), 100):
-        chunk = track_ids[i:i+100]
-        all_features += get_audio_features(access_token, chunk)
-
-    # Build a lookup dict: id -> features
-    features_by_id = {f["id"]: f for f in all_features}
-
-    # Merge track info + audio features into one object per track
+    # Fetch Last.fm tags for each track
+    print("Fetching mood tags from Last.fm (this takes ~30 seconds)...")
     matrix = []
-    for track in unique_tracks:
-        tid = track["id"]
-        if tid in features_by_id:
-            row = {**track, **features_by_id[tid]}  # merge both dicts
-            matrix.append(row)
+    for i, track in enumerate(unique_tracks):
+        tags = get_lastfm_tags(track["name"], track["artist"])
+        matrix.append({
+            "id":     track["id"],
+            "name":   track["name"],
+            "artist": track["artist"],
+            "tags":   tags,
+        })
+        # Be polite to the Last.fm API — don't hammer it
+        time.sleep(0.2)
+
+        # Print progress every 20 tracks
+        if (i + 1) % 20 == 0:
+            print(f"  {i + 1}/{len(unique_tracks)} tracks processed...")
+
+    print(f"Feature matrix complete: {len(matrix)} tracks with mood tags")
 
     with open("track_data.json", "w") as f:
         json.dump(matrix, f, indent=2)
     print("Saved to track_data.json")
 
-    print(f"Feature matrix complete: {len(matrix)} tracks × 6 audio features")
     return matrix

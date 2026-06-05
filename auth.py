@@ -28,17 +28,19 @@ app.secret_key = secrets.token_hex(16)  # needed for Flask sessions
 # ── Route 1: the login page ──────────────────────────────────────────
 @app.route("/login")
 def login():
-    # A random string we generate to protect against CSRF attacks
+    # Always force a fresh Spotify login by clearing session first
+    session.clear()
+    
     state = secrets.token_hex(16)
     session["oauth_state"] = state
 
-    # Build the URL that sends the user to Spotify's login page
     params = {
         "client_id":     CLIENT_ID,
         "response_type": "code",
         "redirect_uri":  REDIRECT_URI,
         "scope":         SCOPES,
         "state":         state,
+        "show_dialog":   "true",  # ← forces Spotify to always show the login screen
     }
     auth_url = "https://accounts.spotify.com/authorize?" + urllib.parse.urlencode(params)
     return redirect(auth_url)
@@ -80,35 +82,42 @@ def callback():
     # Show the first 5 tracks so we can verify it's working
     preview = ""
     for track in matrix[:5]:
+        tags_str = ", ".join(track["tags"][:5]) if track["tags"] else "no tags found"
         preview += f"""
             <tr>
                 <td>{track['name']}</td>
                 <td>{track['artist']}</td>
-                <td>{track['valence']:.2f}</td>
-                <td>{track['energy']:.2f}</td>
-                <td>{track['danceability']:.2f}</td>
-                <td>{int(track['tempo'])} BPM</td>
+                <td>{tags_str}</td>
             </tr>
         """
 
     return f"""
-        <h2>✅ Auth + data fetch successful!</h2>
-        <p>Pulled <b>{len(matrix)}</b> tracks with audio features.</p>
+        <h2>✅ Success!</h2>
+        <p>Pulled <b>{len(matrix)}</b> tracks with mood tags.</p>
         <table border="1" cellpadding="8">
-            <tr>
-                <th>Track</th><th>Artist</th>
-                <th>Valence 😊</th><th>Energy ⚡</th>
-                <th>Danceability 💃</th><th>Tempo</th>
-            </tr>
+            <tr><th>Track</th><th>Artist</th><th>Mood Tags</th></tr>
             {preview}
         </table>
         <p><i>Showing first 5 of {len(matrix)} tracks.</i></p>
     """
 
+
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect("/login")
+    return '''
+        <html>
+        <body>
+        <script>
+            document.cookie.split(";").forEach(function(c) {
+                document.cookie = c.trim().split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+            });
+            window.location.href = "/login";
+        </script>
+        <p>Logging out...</p>
+        </body>
+        </html>
+    '''
 
 
 # ── Entry point ───────────────────────────────────────────────────────
