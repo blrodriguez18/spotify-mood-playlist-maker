@@ -105,6 +105,11 @@ def callback():
         <p><i>Showing first 5 of {len(matrix)} tracks.</i></p>
     """
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
 
 # ── Entry point ───────────────────────────────────────────────────────
 if __name__ == "__main__":
