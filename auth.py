@@ -82,20 +82,28 @@ def callback():
     # Show the first 5 tracks so we can verify it's working
     preview = ""
     for track in matrix[:5]:
-        tags_str = ", ".join(track["tags"][:5]) if track["tags"] else "no tags found"
         preview += f"""
             <tr>
                 <td>{track['name']}</td>
                 <td>{track['artist']}</td>
-                <td>{tags_str}</td>
+                <td>{track['valence']:.2f}</td>
+                <td>{track['energy']:.2f}</td>
+                <td>{track['danceability']:.2f}</td>
+                <td>{int(track['tempo'])} BPM</td>
+                <td>{track['mood']}</td>
             </tr>
         """
 
     return f"""
         <h2>✅ Success!</h2>
-        <p>Pulled <b>{len(matrix)}</b> tracks with mood tags.</p>
+        <p>Pulled <b>{len(matrix)}</b> tracks with audio features.</p>
         <table border="1" cellpadding="8">
-            <tr><th>Track</th><th>Artist</th><th>Mood Tags</th></tr>
+            <tr>
+                <th>Track</th><th>Artist</th>
+                <th>Valence</th><th>Energy</th>
+                <th>Danceability</th><th>Tempo</th>
+                <th>Mood</th>
+            </tr>
             {preview}
         </table>
         <p><i>Showing first 5 of {len(matrix)} tracks.</i></p>
