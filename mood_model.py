@@ -18,12 +18,13 @@ def load_tracks(path="track_data.json"):
 
 # ── 2. Build the feature matrix ───────────────────────────────────────
 def build_X(tracks):
-    base_rows  = []
-    mood_rows  = []
-    mood_names = ["happy", "sad", "aggressive", "relaxed", "party"]
-
+    """
+    Pure audio features only — real measured values for every track.
+    No imputation, no noise from sparse mood vectors.
+    """
+    rows = []
     for t in tracks:
-        base_rows.append([
+        rows.append([
             t["valence"],
             t["energy"],
             t["danceability"],
@@ -31,71 +32,9 @@ def build_X(tracks):
             t["acousticness"],
         ])
 
-        mv = t.get("mood_vector")
-        if mv and any(mv.get(m, 0) > 0 for m in mood_names):
-            mood_rows.append([mv.get(m, 0) for m in mood_names])
-        else:
-            mood_rows.append(None)
-
-    # ── Build per-mood-label mean vectors from tracks that DO have data ──
-    # Group real mood vectors by the track's freqblog 'mood' label
-    # e.g. all tracks labeled "happy" that have real vectors get averaged
-    mood_label_groups = {}
-    for t, mv_row in zip(tracks, mood_rows):
-        if mv_row is None:
-            continue
-        label = t.get("mood", "unknown").lower()
-        if label not in mood_label_groups:
-            mood_label_groups[label] = []
-        mood_label_groups[label].append(mv_row)
-
-    # Compute the mean vector for each mood label
-    mood_label_means = {}
-    for label, vectors in mood_label_groups.items():
-        arr = np.array(vectors)
-        mood_label_means[label] = arr.mean(axis=0).tolist()
-        print(f"  Mood '{label}': {len(vectors)} tracks with real vectors → mean computed")
-
-    # Global fallback mean in case a mood label has zero real vectors
-    all_real = [mv for mv in mood_rows if mv is not None]
-    global_mean = np.array(all_real).mean(axis=0).tolist() if all_real else [0.2] * 5
-
-    # ── Impute missing mood vectors using the per-label mean ─────────────
-    mood_rows_filled = []
-    imputed_count = 0
-    for t, mv_row in zip(tracks, mood_rows):
-        if mv_row is not None:
-            mood_rows_filled.append(mv_row)
-        else:
-            label = t.get("mood", "unknown").lower()
-            if label in mood_label_means:
-                # Use the mean of tracks with the same mood label — meaningful imputation
-                mood_rows_filled.append(mood_label_means[label])
-            else:
-                # Last resort: global mean (rare — only if label has no real vectors at all)
-                mood_rows_filled.append(global_mean)
-            imputed_count += 1
-
-    print(f"\nImputed {imputed_count} missing mood vectors using per-label means")
-
-    # ── Scale both feature sets ───────────────────────────────────────────
-    base_array = np.array(base_rows)
-    mood_array = np.array(mood_rows_filled)
-
-    scaler_base = StandardScaler()
-    scaler_mood = StandardScaler()
-    base_scaled = scaler_base.fit_transform(base_array)
-    mood_scaled = scaler_mood.fit_transform(mood_array)
-
-    # Weight mood at 0.5x — it's derived/imputed for many tracks
-    # so we don't want it to dominate over the real audio features
-    X = np.hstack([base_scaled, mood_scaled * 0.5])
-
-    has_real_mood = len(tracks) - imputed_count
+    X = np.array(rows)
     print(f"Feature matrix: {X.shape[0]} tracks × {X.shape[1]} features")
-    print(f"Real mood vectors: {has_real_mood}  |  Imputed: {imputed_count}")
-
-    return X, scaler_base, scaler_mood
+    return X
 
 
 # ── 3. Scale the features ─────────────────────────────────────────────
@@ -198,7 +137,7 @@ def print_summary(profiles):
 
 
 # ── 8. Save everything ────────────────────────────────────────────────
-def save_model(km, scaler_base, profiles, tracks, labels):
+def save_model(km, scaler, profiles, tracks, labels):
     labeled_tracks = []
     for track, label in zip(tracks, labels):
         labeled_tracks.append({**track, "cluster": int(label)})
@@ -208,22 +147,25 @@ def save_model(km, scaler_base, profiles, tracks, labels):
 
     with open("mood_model.pkl", "wb") as f:
         pickle.dump({
-            "model":       km,
-            "scaler_base": scaler_base,
-            "scaler_mood": scaler_mood,  # ← added
-            "profiles":    profiles,
+            "model":    km,
+            "scaler":   scaler,
+            "profiles": profiles,
         }, f)
 
     print("\nSaved mood_model.pkl and labeled_tracks.json")
 
 
 # ── Run everything ────────────────────────────────────────────────────
+# build_X now returns just X
+# update if __name__ == "__main__":
 if __name__ == "__main__":
-    tracks                      = load_tracks()
-    X, scaler_base, scaler_mood = build_X(tracks)
-    best_k                      = find_best_k(X)
-    km                          = train(X, best_k)
-    labels                      = km.labels_
-    profiles                    = label_clusters(tracks, labels, best_k)
+    tracks   = load_tracks()
+    X        = build_X(tracks)
+    scaler   = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    best_k   = find_best_k(X_scaled)
+    km       = train(X_scaled, best_k)
+    labels   = km.labels_
+    profiles = label_clusters(tracks, labels, best_k)
     print_summary(profiles)
-    save_model(km, scaler_base, profiles, tracks, labels)
+    save_model(km, scaler, profiles, tracks, labels)
