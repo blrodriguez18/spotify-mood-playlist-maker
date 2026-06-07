@@ -81,13 +81,16 @@ def get_audio_features(track_name, artist_name):
             return None
 
         return {
-            "valence":      float(data.get("valence", 0)),       # 0=sad, 1=happy
-            "energy":       float(data.get("energy", 0)),        # 0=calm, 1=intense
-            "danceability": float(data.get("danceability", 0)),  # 0=stiff, 1=danceable
-            "tempo":        float(data.get("bpm", 0)),           # BPM
-            "acousticness": float(data.get("acousticness", 0)),  # 0=electric, 1=acoustic
-            "mood":         data.get("mood", ""),                # e.g. "Happy", "Sad"
-            "mood_vector":  data.get("mood_vector", None),
+            "valence":          float(data.get("valence", 0)),
+            "energy":           float(data.get("energy", 0)),
+            "danceability":     float(data.get("danceability", 0)),
+            "tempo":            float(data.get("bpm", 0)),
+            "acousticness":     float(data.get("acousticness", 0)),
+            "mood":             data.get("mood", ""),
+            "mood_vector":      data.get("mood_vector", None),
+            "speechiness":      float(data.get("speechiness", 0)),      # ← add
+            "instrumentalness": float(data.get("instrumentalness", 0)), # ← add
+            "loudness":         float(data.get("loudness_db", 0)),      # ← add
         }
     except Exception as e:
         print(f"  Error fetching {track_name}: {e}")
@@ -105,8 +108,11 @@ def build_feature_matrix(access_token):
     print("Fetching recently played...")
     recent     = get_recently_played(access_token)
 
+    print("Fetching liked songs...")
+    liked = get_liked_songs(access_token)
+
     # Deduplicate by Spotify track ID
-    all_tracks = {t["id"]: t for t in top_short + top_medium + recent}
+    all_tracks = {t["id"]: t for t in top_short + top_medium + recent + liked}
     unique_tracks = list(all_tracks.values())
     print(f"Total unique tracks: {len(unique_tracks)}")
 
@@ -119,16 +125,19 @@ def build_feature_matrix(access_token):
         if features is None:
             return None
         return {
-            "id":           track["id"],
-            "name":         track["name"],
-            "artist":       track["artist"],
-            "valence":      features["valence"],
-            "energy":       features["energy"],
-            "danceability": features["danceability"],
-            "tempo":        features["tempo"],
-            "acousticness": features["acousticness"],
-            "mood":         features["mood"],
-            "mood_vector":  features["mood_vector"],
+            "id":               track["id"],
+            "name":             track["name"],
+            "artist":           track["artist"],
+            "valence":          features["valence"],
+            "energy":           features["energy"],
+            "danceability":     features["danceability"],
+            "tempo":            features["tempo"],
+            "acousticness":     features["acousticness"],
+            "mood":             features["mood"],
+            "mood_vector":      features["mood_vector"],
+            "speechiness":      features["speechiness"],      # ← add
+            "instrumentalness": features["instrumentalness"], # ← add
+            "loudness":         features["loudness"],         # ← add
         }
 
     # Fetch 10 tracks simultaneously instead of one at a time
@@ -154,3 +163,39 @@ def build_feature_matrix(access_token):
     print("Saved to track_data.json")
 
     return matrix
+
+def get_liked_songs(access_token, limit=2000):
+    """
+    Fetch the user's saved/liked songs.
+    Spotify returns max 50 per request so we page through them.
+    """
+    url = f"{BASE_URL}/me/tracks"
+    tracks = []
+    offset = 0
+
+    while len(tracks) < limit:
+        params = {"limit": 50, "offset": offset}
+        response = requests.get(url, headers=get_headers(access_token), params=params)
+        data = response.json()
+
+        items = data.get("items", [])
+        if not items:
+            break  # no more tracks
+
+        for item in items:
+            track = item["track"]
+            if track and track.get("id"):
+                tracks.append({
+                    "id":     track["id"],
+                    "name":   track["name"],
+                    "artist": track["artists"][0]["name"],
+                })
+
+        offset += 50
+        print(f"  Fetched {len(tracks)} liked songs so far...")
+
+        if len(items) < 50:
+            break  # reached the end
+
+    print(f"Total liked songs fetched: {len(tracks)}")
+    return tracks
