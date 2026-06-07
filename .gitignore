@@ -1,3 +1,4 @@
 .env
+dataset.csv
 venv/
 __pycache__/
