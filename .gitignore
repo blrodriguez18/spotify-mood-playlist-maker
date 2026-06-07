@@ -2,3 +2,6 @@
 dataset.csv
 venv/
 __pycache__/
+mood_model.pkl
+mood_classifier.pkl
+mood_classifier_kmeans.pkl
