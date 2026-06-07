@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 import pickle
 
@@ -24,6 +24,7 @@ GENRE_TO_MOOD = {
     "deep-house":        "energized",
     "detroit-techno":    "energized",
     "drum-and-bass":     "energized",
+    "german":            "energized",
     "dubstep":           "energized",
     "hardstyle":         "energized",
     "minimal-techno":    "energized",
@@ -32,6 +33,7 @@ GENRE_TO_MOOD = {
     "trance":            "energized",
     "breakbeat":         "energized",
     "club":              "energized",
+    "idm":               "energized",
 
     # HAPPY — bright, feel-good, positive
     "happy":             "happy",
@@ -87,16 +89,21 @@ GENRE_TO_MOOD = {
     "reggaeton":         "chill",
     "salsa":             "chill",
     "tango":             "chill",
+    "study":             "chill",
+    "ambient":           "chill",
+    "instrumental":      "chill",
+    "new-age":           "chill",  
 
     # MELANCHOLIC — sad, emotional, reflective
     "sad":               "melancholic",
     "emo":               "melancholic",
+    "classical":         "melancholic", 
+    "piano":             "melancholic", 
     "goth":              "melancholic",
     "blues":             "melancholic",
     "alternative":       "melancholic",
     "alt-rock":          "melancholic",
     "grunge":            "melancholic",
-    "indie":             "melancholic",
     "psych-rock":        "melancholic",
     "r-n-b":             "melancholic",
     "sleep":             "melancholic",
@@ -114,16 +121,6 @@ GENRE_TO_MOOD = {
     "anime":             "melancholic",
     "j-rock":            "melancholic",
 
-    # FOCUSED — steady, instrumental, no distraction
-    "study":             "focused",
-    "idm":               "focused",
-    "ambient":           "focused",
-    "classical":         "focused",
-    "piano":             "focused",
-    "new-age":           "focused",
-    "instrumental":      "focused",
-    "german":            "focused",
-
     # AGGRESSIVE — intense, hard, high energy
     "metal":             "aggressive",
     "black-metal":       "aggressive",
@@ -140,13 +137,13 @@ GENRE_TO_MOOD = {
     "rock-n-roll":       "aggressive",
     "hip-hop":           "aggressive",
     "british":           "aggressive",
-    "turkish":           "aggressive",
 }
+
 
 
 FEATURES = ["valence", "energy", "danceability", "tempo",
             "acousticness", "speechiness", "instrumentalness",
-            "liveness", "loudness"]
+            "liveness", "loudness",]
 
 
 # ── 2. Load and prepare data ──────────────────────────────────────────
@@ -161,7 +158,10 @@ def load_data(path="dataset.csv"):
 
     # Show class distribution so we can spot imbalances
     print("\nMood distribution:")
-    print(df["mood"].value_counts())
+    mood_list = df["mood"].value_counts().index.tolist()
+    val_list = df["mood"].value_counts().tolist()
+    for i in range(len(df["mood"].value_counts())):
+        print(f"{mood_list[i]:<15} {val_list[i]:>6} : {100*val_list[i]/len(df):.2f}%")
 
     return df
 
@@ -179,11 +179,12 @@ def train(df):
     print(f"\nTraining on {len(X_train)} tracks, testing on {len(X_test)}...")
 
     clf = RandomForestClassifier(
-        n_estimators=200,
-        max_depth=15,
-        class_weight="balanced",  # handles unequal mood class sizes
+        n_estimators=500,       # more trees = more stable predictions
+        max_depth=20,           # allow deeper trees to capture nuance
+        min_samples_leaf=5,     # prevent overfitting on noise
+        class_weight="balanced",
         random_state=42,
-        n_jobs=-1,                # use all CPU cores
+        n_jobs=-1,
     )
     clf.fit(X_train, y_train)
 
@@ -193,11 +194,21 @@ def train(df):
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred, target_names=le.classes_))
 
+    cm = confusion_matrix(y_test, y_pred)
+    cm_df = pd.DataFrame(
+        cm,
+        index=[f"actual: {c}" for c in le.classes_],
+        columns=[f"pred: {c}" for c in le.classes_]
+    )
+    print("\nConfusion Matrix:")
+    print(cm_df.to_string())
+
     # Feature importance
     print("Feature importances:")
     for feat, imp in sorted(zip(FEATURES, clf.feature_importances_), key=lambda x: x[1], reverse=True):
         bar = "█" * int(imp * 100)
         print(f"  {feat:<20} {imp:.4f}  {bar}")
+
 
     return clf, le
 
