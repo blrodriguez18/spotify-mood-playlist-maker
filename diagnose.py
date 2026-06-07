@@ -46,3 +46,16 @@
 # print("  Silhouette      → higher is better  (max 1.0)")
 # print("  Davies-Bouldin  → lower is better   (min 0.0)")
 # print("  Calinski-Harabasz → higher is better (no upper bound)")
+
+
+import json
+
+with open("track_data.json") as f:
+    tracks = json.load(f)
+
+needed = ["valence", "energy", "danceability", "tempo",
+          "acousticness", "speechiness", "instrumentalness", "loudness"]
+
+for feat in needed:
+    count = sum(1 for t in tracks if t.get(feat) is not None)
+    print(f"{feat:<20} {count:>3} / {len(tracks)} tracks have it")

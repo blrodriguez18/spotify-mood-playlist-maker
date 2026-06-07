@@ -8,11 +8,13 @@
     "danceability": 0.7311,
     "tempo": 100.33,
     "acousticness": 0.9903,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.1868,
     "instrumentalness": 0.237,
-    "loudness": -13.27
+    "loudness": -13.27,
+    "mood_id": 3,
+    "confidence": 0.4967
   },
   {
     "id": "0oRkUV0i9MWGh3MtT62afO",
@@ -23,11 +25,13 @@
     "danceability": 0.7076,
     "tempo": 86.14,
     "acousticness": 0.9919,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.5899,
     "instrumentalness": 0.2454,
-    "loudness": -14.03
+    "loudness": -14.03,
+    "mood_id": 3,
+    "confidence": 0.4767
   },
   {
     "id": "62J3LcwTASdo624WsF3L6k",
@@ -38,11 +42,13 @@
     "danceability": 0.7496,
     "tempo": 146.04,
     "acousticness": 0.9146,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.6854,
     "instrumentalness": 0.273,
-    "loudness": -11.23
+    "loudness": -11.23,
+    "mood_id": 3,
+    "confidence": 0.4167
   },
   {
     "id": "6q3zC9dDD4lUNk8nfUztXy",
@@ -57,7 +63,9 @@
     "mood_vector": null,
     "speechiness": 0.6022,
     "instrumentalness": 0.0225,
-    "loudness": -13.03
+    "loudness": -13.03,
+    "mood_id": 3,
+    "confidence": 0.88
   },
   {
     "id": "0lYBSQXN6rCTvUZvg9S0lU",
@@ -68,11 +76,13 @@
     "danceability": 0.7653,
     "tempo": 99.69,
     "acousticness": 0.9931,
-    "mood": "tense",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.4691,
     "instrumentalness": 0.2918,
-    "loudness": -11.97
+    "loudness": -11.97,
+    "mood_id": 0,
+    "confidence": 0.3033
   },
   {
     "id": "0RJWhctsc1G1Hg3Ov2th7x",
@@ -83,7 +93,7 @@
     "danceability": 0.8268,
     "tempo": 107.58,
     "acousticness": 0.9924,
-    "mood": "tense",
+    "mood": "epic",
     "mood_vector": {
       "happy": 0.013,
       "sad": 0.2992,
@@ -93,7 +103,9 @@
     },
     "speechiness": 0.4638,
     "instrumentalness": 0.3646,
-    "loudness": -12.39
+    "loudness": -12.39,
+    "mood_id": 0,
+    "confidence": 0.46
   },
   {
     "id": "1vnnXMrBeEWiRg3YCMCjQq",
@@ -104,7 +116,7 @@
     "danceability": 0.7405,
     "tempo": 99.88,
     "acousticness": 0.9596,
-    "mood": "energetic",
+    "mood": "melancholic",
     "mood_vector": {
       "happy": 0.1028,
       "sad": 0.1579,
@@ -114,7 +126,9 @@
     },
     "speechiness": 0.6154,
     "instrumentalness": 0.1758,
-    "loudness": -16.05
+    "loudness": -16.05,
+    "mood_id": 2,
+    "confidence": 0.4633
   },
   {
     "id": "7Mts0OfPorF4iwOomvfqn1",
@@ -125,11 +139,13 @@
     "danceability": 0.6778,
     "tempo": 88.35,
     "acousticness": 0.9591,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.4508,
     "instrumentalness": 0.3106,
-    "loudness": -10.14
+    "loudness": -10.14,
+    "mood_id": 0,
+    "confidence": 0.3567
   },
   {
     "id": "6yfa7stvsbbuDzFsHKG8ez",
@@ -144,7 +160,9 @@
     "mood_vector": null,
     "speechiness": 0.3505,
     "instrumentalness": 0.1787,
-    "loudness": -10.08
+    "loudness": -10.08,
+    "mood_id": 3,
+    "confidence": 0.8333
   },
   {
     "id": "4PMqSO5qyjpvzhlLI5GnID",
@@ -155,11 +173,13 @@
     "danceability": 0.3995,
     "tempo": 61.27,
     "acousticness": 0.9942,
-    "mood": "tense",
+    "mood": "chill",
     "mood_vector": null,
     "speechiness": 0.3596,
     "instrumentalness": 0.3468,
-    "loudness": -13.63
+    "loudness": -13.63,
+    "mood_id": 4,
+    "confidence": 0.5167
   },
   {
     "id": "51hyZpbJlIgZIaX3TtMxmu",
@@ -174,7 +194,9 @@
     "mood_vector": null,
     "speechiness": 0.5831,
     "instrumentalness": 0.1813,
-    "loudness": -11.25
+    "loudness": -11.25,
+    "mood_id": 3,
+    "confidence": 0.7967
   },
   {
     "id": "6I3mqTwhRpn34SLVafSH7G",
@@ -185,11 +207,13 @@
     "danceability": 0.6656,
     "tempo": 102.41,
     "acousticness": 0.9915,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.3909,
     "instrumentalness": 0.0,
-    "loudness": -12.8
+    "loudness": -12.8,
+    "mood_id": 3,
+    "confidence": 0.62
   },
   {
     "id": "3OfqwyE7RrZrtuxCRixfII",
@@ -200,11 +224,13 @@
     "danceability": 0.7826,
     "tempo": 114.92,
     "acousticness": 0.9587,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.3111,
     "instrumentalness": 0.168,
-    "loudness": -9.53
+    "loudness": -9.53,
+    "mood_id": 3,
+    "confidence": 0.58
   },
   {
     "id": "1xOqGUkyxGQRdCvGpvWKmL",
@@ -215,11 +241,13 @@
     "danceability": 0.7444,
     "tempo": 145.94,
     "acousticness": 0.9539,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.4809,
     "instrumentalness": 0.184,
-    "loudness": -10.72
+    "loudness": -10.72,
+    "mood_id": 3,
+    "confidence": 0.6267
   },
   {
     "id": "53iuhJlwXhSER5J2IYYv1W",
@@ -230,11 +258,13 @@
     "danceability": 0.8478,
     "tempo": 123.75,
     "acousticness": 0.9912,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.4913,
     "instrumentalness": 0.3271,
-    "loudness": -10.64
+    "loudness": -10.64,
+    "mood_id": 0,
+    "confidence": 0.3633
   },
   {
     "id": "12KUFSHFgT0XCoiSlvdQi4",
@@ -245,7 +275,7 @@
     "danceability": 0.7281,
     "tempo": 129.92,
     "acousticness": 0.9341,
-    "mood": "happy",
+    "mood": "melancholic",
     "mood_vector": {
       "happy": 0.7811,
       "sad": 0.3073,
@@ -255,7 +285,9 @@
     },
     "speechiness": 0.6371,
     "instrumentalness": 0.2874,
-    "loudness": -14.82
+    "loudness": -14.82,
+    "mood_id": 2,
+    "confidence": 0.55
   },
   {
     "id": "3zHq9ouUJQFQRf3cm1rRLu",
@@ -266,11 +298,13 @@
     "danceability": 0.7681,
     "tempo": 94.72,
     "acousticness": 0.9981,
-    "mood": "energetic",
+    "mood": "melancholic",
     "mood_vector": null,
     "speechiness": 0.5011,
     "instrumentalness": 0.3678,
-    "loudness": -13.62
+    "loudness": -13.62,
+    "mood_id": 2,
+    "confidence": 0.5233
   },
   {
     "id": "6A18pcBX8QZGwI8EkR7aIP",
@@ -285,7 +319,9 @@
     "mood_vector": null,
     "speechiness": 0.3674,
     "instrumentalness": 0.0615,
-    "loudness": -13.17
+    "loudness": -13.17,
+    "mood_id": 3,
+    "confidence": 0.8633
   },
   {
     "id": "7fa9MBXhVfQ8P8Df9OEbD8",
@@ -300,7 +336,9 @@
     "mood_vector": null,
     "speechiness": 0.3306,
     "instrumentalness": 0.0897,
-    "loudness": -12.92
+    "loudness": -12.92,
+    "mood_id": 3,
+    "confidence": 0.86
   },
   {
     "id": "1XZE0InCx3SdCnLpVsPpZl",
@@ -311,11 +349,13 @@
     "danceability": 0.8045,
     "tempo": 128.5,
     "acousticness": 0.9988,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.3917,
     "instrumentalness": 0.2289,
-    "loudness": -14.03
+    "loudness": -14.03,
+    "mood_id": 3,
+    "confidence": 0.4967
   },
   {
     "id": "6RUKPb4LETWmmr3iAEQktW",
@@ -326,11 +366,13 @@
     "danceability": 0.7564,
     "tempo": 103.04,
     "acousticness": 0.9702,
-    "mood": "energetic",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.4309,
     "instrumentalness": 0.3298,
-    "loudness": -12.5
+    "loudness": -12.5,
+    "mood_id": 0,
+    "confidence": 0.3967
   },
   {
     "id": "5pIcwtJYNJx93l420oR2Vm",
@@ -341,11 +383,13 @@
     "danceability": 0.7798,
     "tempo": 136.63,
     "acousticness": 0.9533,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.5222,
     "instrumentalness": 0.5007,
-    "loudness": -12.83
+    "loudness": -12.83,
+    "mood_id": 0,
+    "confidence": 0.46
   },
   {
     "id": "3UGIZ8qcrMTwzLbx6Kttqt",
@@ -356,11 +400,13 @@
     "danceability": 0.7795,
     "tempo": 96.97,
     "acousticness": 0.9451,
-    "mood": "tense",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.4399,
     "instrumentalness": 0.0077,
-    "loudness": -13.26
+    "loudness": -13.26,
+    "mood_id": 3,
+    "confidence": 0.6633
   },
   {
     "id": "6hkOqJ5mE093AQf2lbZnsG",
@@ -375,7 +421,9 @@
     "mood_vector": null,
     "speechiness": 0.425,
     "instrumentalness": 0.2669,
-    "loudness": -12.85
+    "loudness": -12.85,
+    "mood_id": 3,
+    "confidence": 0.69
   },
   {
     "id": "7vS3Y0IKjde7Xg85LWIEdP",
@@ -386,11 +434,13 @@
     "danceability": 0.6693,
     "tempo": 102.87,
     "acousticness": 0.9396,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.5942,
     "instrumentalness": 0.2164,
-    "loudness": -13.94
+    "loudness": -13.94,
+    "mood_id": 3,
+    "confidence": 0.6033
   },
   {
     "id": "7BqBn9nzAq8spo5e7cZ0dJ",
@@ -401,11 +451,13 @@
     "danceability": 0.8479,
     "tempo": 108.89,
     "acousticness": 0.9844,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.3705,
     "instrumentalness": 0.3796,
-    "loudness": -9.44
+    "loudness": -9.44,
+    "mood_id": 0,
+    "confidence": 0.4867
   },
   {
     "id": "0mTPnb6emUEznkuVI0ZNLy",
@@ -420,7 +472,9 @@
     "mood_vector": null,
     "speechiness": 0.4172,
     "instrumentalness": 0.293,
-    "loudness": -10.65
+    "loudness": -10.65,
+    "mood_id": 3,
+    "confidence": 0.6267
   },
   {
     "id": "0gJvqi9QyASOCtJu99tytc",
@@ -431,11 +485,13 @@
     "danceability": 0.7659,
     "tempo": 139.86,
     "acousticness": 0.9824,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.4657,
     "instrumentalness": 0.3905,
-    "loudness": -12.55
+    "loudness": -12.55,
+    "mood_id": 0,
+    "confidence": 0.48
   },
   {
     "id": "0kFTS4OH2t44gsLN0a8Khr",
@@ -446,11 +502,13 @@
     "danceability": 0.7815,
     "tempo": 135.92,
     "acousticness": 0.9489,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.5538,
     "instrumentalness": 0.3473,
-    "loudness": -12.64
+    "loudness": -12.64,
+    "mood_id": 0,
+    "confidence": 0.3967
   },
   {
     "id": "0PBTlQ84CBJF0tBnKGmQa6",
@@ -465,7 +523,9 @@
     "mood_vector": null,
     "speechiness": 0.4956,
     "instrumentalness": 0.1042,
-    "loudness": -10.79
+    "loudness": -10.79,
+    "mood_id": 3,
+    "confidence": 0.5367
   },
   {
     "id": "0F3mV23VgvEE1WlTUSKfx4",
@@ -476,11 +536,13 @@
     "danceability": 0.6021,
     "tempo": 104.01,
     "acousticness": 0.9855,
-    "mood": "tense",
+    "mood": "melancholic",
     "mood_vector": null,
     "speechiness": 0.5482,
     "instrumentalness": 0.1856,
-    "loudness": -14.63
+    "loudness": -14.63,
+    "mood_id": 2,
+    "confidence": 0.5067
   },
   {
     "id": "0v35bLSJRyWjnbGmBqbJtk",
@@ -491,7 +553,7 @@
     "danceability": 0.6535,
     "tempo": 135.22,
     "acousticness": 0.9924,
-    "mood": "energetic",
+    "mood": "melancholic",
     "mood_vector": {
       "happy": 0.1945,
       "sad": 0.8366,
@@ -501,7 +563,9 @@
     },
     "speechiness": 0.3198,
     "instrumentalness": 0.0339,
-    "loudness": -16.86
+    "loudness": -16.86,
+    "mood_id": 2,
+    "confidence": 0.5733
   },
   {
     "id": "101iWa6yaODTI0RWewMK1B",
@@ -516,7 +580,9 @@
     "mood_vector": null,
     "speechiness": 0.3687,
     "instrumentalness": 0.2604,
-    "loudness": -11.42
+    "loudness": -11.42,
+    "mood_id": 3,
+    "confidence": 0.6633
   },
   {
     "id": "1JSTJqkT5qHq8MDJnJbRE1",
@@ -527,7 +593,7 @@
     "danceability": 0.8445,
     "tempo": 117.4,
     "acousticness": 0.9967,
-    "mood": "neutral",
+    "mood": "melancholic",
     "mood_vector": {
       "happy": 0.8116,
       "sad": 0.5965,
@@ -537,7 +603,9 @@
     },
     "speechiness": 0.2908,
     "instrumentalness": 0.1636,
-    "loudness": -17.58
+    "loudness": -17.58,
+    "mood_id": 2,
+    "confidence": 0.47
   },
   {
     "id": "1NrJYpdAi7uosDRPmSYrsG",
@@ -548,7 +616,7 @@
     "danceability": 0.8272,
     "tempo": 117.64,
     "acousticness": 0.9739,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": {
       "happy": 0.1805,
       "sad": 0.2351,
@@ -558,7 +626,9 @@
     },
     "speechiness": 0.4115,
     "instrumentalness": 0.0841,
-    "loudness": -14.16
+    "loudness": -14.16,
+    "mood_id": 3,
+    "confidence": 0.5967
   },
   {
     "id": "1A3T3npKsrElQTjTEcr3LR",
@@ -573,7 +643,9 @@
     "mood_vector": null,
     "speechiness": 0.9581,
     "instrumentalness": 0.2064,
-    "loudness": -10.32
+    "loudness": -10.32,
+    "mood_id": 3,
+    "confidence": 0.83
   },
   {
     "id": "1dByUyyoRKL99fJJ6VCQzb",
@@ -584,11 +656,13 @@
     "danceability": 0.5483,
     "tempo": 84.0,
     "acousticness": 0.9908,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.4967,
     "instrumentalness": 0.3314,
-    "loudness": -10.62
+    "loudness": -10.62,
+    "mood_id": 0,
+    "confidence": 0.3233
   },
   {
     "id": "1CPZ5BxNNd0n0nF4Orb9JS",
@@ -603,7 +677,9 @@
     "mood_vector": null,
     "speechiness": 0.4733,
     "instrumentalness": 0.3156,
-    "loudness": -10.12
+    "loudness": -10.12,
+    "mood_id": 3,
+    "confidence": 0.44
   },
   {
     "id": "1hR8BSuEqPCCZfv93zzzz9",
@@ -614,11 +690,13 @@
     "danceability": 0.8486,
     "tempo": 116.85,
     "acousticness": 0.9446,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.4639,
     "instrumentalness": 0.3314,
-    "loudness": -10.89
+    "loudness": -10.89,
+    "mood_id": 0,
+    "confidence": 0.3667
   },
   {
     "id": "1P17dC1amhFzptugyAO7Il",
@@ -629,11 +707,13 @@
     "danceability": 0.8093,
     "tempo": 128.52,
     "acousticness": 0.9295,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.547,
     "instrumentalness": 0.0,
-    "loudness": -12.58
+    "loudness": -12.58,
+    "mood_id": 3,
+    "confidence": 0.6767
   },
   {
     "id": "3qhlB30KknSejmIvZZLjOD",
@@ -644,11 +724,13 @@
     "danceability": 0.628,
     "tempo": 161.6,
     "acousticness": 0.9939,
-    "mood": "happy",
+    "mood": "melancholic",
     "mood_vector": null,
     "speechiness": 0.3388,
     "instrumentalness": 0.2475,
-    "loudness": -13.32
+    "loudness": -13.32,
+    "mood_id": 2,
+    "confidence": 0.4567
   },
   {
     "id": "19GxfaRs5KdurzPKLVX3Cq",
@@ -659,11 +741,13 @@
     "danceability": 0.7778,
     "tempo": 139.88,
     "acousticness": 0.8601,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.776,
     "instrumentalness": 0.2314,
-    "loudness": -12.4
+    "loudness": -12.4,
+    "mood_id": 3,
+    "confidence": 0.58
   },
   {
     "id": "1o844wI52S3TjXGBwvGcc7",
@@ -674,11 +758,13 @@
     "danceability": 0.7059,
     "tempo": 118.38,
     "acousticness": 0.9215,
-    "mood": "tense",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.5103,
     "instrumentalness": 0.1859,
-    "loudness": -14.1
+    "loudness": -14.1,
+    "mood_id": 3,
+    "confidence": 0.48
   },
   {
     "id": "24Y63uAvj6Oc9jGuTlhlgf",
@@ -693,7 +779,9 @@
     "mood_vector": null,
     "speechiness": 0.4474,
     "instrumentalness": 0.2004,
-    "loudness": -9.46
+    "loudness": -9.46,
+    "mood_id": 3,
+    "confidence": 0.7733
   },
   {
     "id": "1iwPfO2kaxmbvFGDYRAXF0",
@@ -704,11 +792,13 @@
     "danceability": 0.7798,
     "tempo": 129.11,
     "acousticness": 0.9546,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.4536,
     "instrumentalness": 0.253,
-    "loudness": -8.98
+    "loudness": -8.98,
+    "mood_id": 3,
+    "confidence": 0.5167
   },
   {
     "id": "7gRFDGEzF9UkBV233yv2dc",
@@ -719,11 +809,13 @@
     "danceability": 0.7976,
     "tempo": 110.02,
     "acousticness": 0.9583,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.7488,
     "instrumentalness": 0.0208,
-    "loudness": -12.7
+    "loudness": -12.7,
+    "mood_id": 3,
+    "confidence": 0.62
   },
   {
     "id": "2eyWFRvT7lOQmqfXI25oR1",
@@ -734,11 +826,13 @@
     "danceability": 0.8174,
     "tempo": 110.04,
     "acousticness": 0.9273,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.6699,
     "instrumentalness": 0.0798,
-    "loudness": -10.53
+    "loudness": -10.53,
+    "mood_id": 3,
+    "confidence": 0.63
   },
   {
     "id": "5XWlyfo0kZ8LF7VSyfS4Ew",
@@ -749,11 +843,13 @@
     "danceability": 0.8203,
     "tempo": 130.45,
     "acousticness": 0.9439,
-    "mood": "energetic",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.6069,
     "instrumentalness": 0.308,
-    "loudness": -9.45
+    "loudness": -9.45,
+    "mood_id": 0,
+    "confidence": 0.3367
   },
   {
     "id": "22vgEDb5hykfaTwLuskFGD",
@@ -764,11 +860,13 @@
     "danceability": 0.7777,
     "tempo": 138.07,
     "acousticness": 0.9108,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.566,
     "instrumentalness": 0.1123,
-    "loudness": -10.64
+    "loudness": -10.64,
+    "mood_id": 3,
+    "confidence": 0.69
   },
   {
     "id": "3k7258ur3vvWD3GI297oRL",
@@ -779,11 +877,13 @@
     "danceability": 0.8335,
     "tempo": 129.97,
     "acousticness": 0.9707,
-    "mood": "energetic",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.3746,
     "instrumentalness": 0.3631,
-    "loudness": -9.41
+    "loudness": -9.41,
+    "mood_id": 0,
+    "confidence": 0.4933
   },
   {
     "id": "1oew3nFNY3vMacJAsvry0S",
@@ -794,7 +894,7 @@
     "danceability": 0.6972,
     "tempo": 87.1,
     "acousticness": 0.9181,
-    "mood": "tense",
+    "mood": "epic",
     "mood_vector": {
       "happy": 0.3901,
       "sad": 0.2642,
@@ -804,7 +904,9 @@
     },
     "speechiness": 0.5625,
     "instrumentalness": 0.404,
-    "loudness": -10.62
+    "loudness": -10.62,
+    "mood_id": 0,
+    "confidence": 0.4833
   },
   {
     "id": "561jH07mF1jHuk7KlaeF0s",
@@ -815,11 +917,13 @@
     "danceability": 0.7187,
     "tempo": 84.63,
     "acousticness": 0.9962,
-    "mood": "tense",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.3511,
     "instrumentalness": 0.0,
-    "loudness": -11.16
+    "loudness": -11.16,
+    "mood_id": 3,
+    "confidence": 0.6267
   },
   {
     "id": "6aJn7Cst74cj4lNIiPRgav",
@@ -830,11 +934,13 @@
     "danceability": 0.6364,
     "tempo": 83.54,
     "acousticness": 0.9518,
-    "mood": "tense",
+    "mood": "energized",
     "mood_vector": null,
     "speechiness": 0.5666,
     "instrumentalness": 0.0688,
-    "loudness": -9.52
+    "loudness": -9.52,
+    "mood_id": 1,
+    "confidence": 0.5367
   },
   {
     "id": "7CmQjA7j6CxyPBkH3tP95W",
@@ -845,11 +951,13 @@
     "danceability": 0.7449,
     "tempo": 97.89,
     "acousticness": 0.9753,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.4068,
     "instrumentalness": 0.1072,
-    "loudness": -10.73
+    "loudness": -10.73,
+    "mood_id": 3,
+    "confidence": 0.6267
   },
   {
     "id": "1ulXmqjktxSdrdT1bzc69H",
@@ -864,7 +972,9 @@
     "mood_vector": null,
     "speechiness": 0.7391,
     "instrumentalness": 0.2928,
-    "loudness": -13.2
+    "loudness": -13.2,
+    "mood_id": 3,
+    "confidence": 0.5133
   },
   {
     "id": "4cDVX9pSt4UQEVbbXKodW6",
@@ -875,11 +985,13 @@
     "danceability": 0.5396,
     "tempo": 74.15,
     "acousticness": 0.989,
-    "mood": "sad",
+    "mood": "melancholic",
     "mood_vector": null,
     "speechiness": 0.2719,
     "instrumentalness": 0.0997,
-    "loudness": -30.07
+    "loudness": -30.07,
+    "mood_id": 2,
+    "confidence": 0.56
   },
   {
     "id": "25ZttbpeUKDOm3aghD2oBJ",
@@ -890,11 +1002,13 @@
     "danceability": 0.8338,
     "tempo": 129.86,
     "acousticness": 0.987,
-    "mood": "energetic",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.5953,
     "instrumentalness": 0.2907,
-    "loudness": -11.73
+    "loudness": -11.73,
+    "mood_id": 0,
+    "confidence": 0.2967
   },
   {
     "id": "2bL2gyO6kBdLkNSkxXNh6x",
@@ -905,7 +1019,7 @@
     "danceability": 0.6704,
     "tempo": 94.89,
     "acousticness": 0.963,
-    "mood": "tense",
+    "mood": "epic",
     "mood_vector": {
       "happy": 0.2125,
       "sad": 0.0804,
@@ -915,7 +1029,9 @@
     },
     "speechiness": 0.3315,
     "instrumentalness": 0.3442,
-    "loudness": -11.22
+    "loudness": -11.22,
+    "mood_id": 0,
+    "confidence": 0.4033
   },
   {
     "id": "5g7sDjBhZ4I3gcFIpkrLuI",
@@ -926,11 +1042,13 @@
     "danceability": 0.7601,
     "tempo": 143.92,
     "acousticness": 0.9926,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.38,
     "instrumentalness": 0.4616,
-    "loudness": -9.58
+    "loudness": -9.58,
+    "mood_id": 0,
+    "confidence": 0.4367
   },
   {
     "id": "0B7tnohfi83RQquo2JRHrL",
@@ -945,7 +1063,9 @@
     "mood_vector": null,
     "speechiness": 0.7303,
     "instrumentalness": 0.2006,
-    "loudness": -12.3
+    "loudness": -12.3,
+    "mood_id": 3,
+    "confidence": 0.7667
   },
   {
     "id": "6ouhsRJ7gExB7LCYjITk4Y",
@@ -956,11 +1076,13 @@
     "danceability": 0.6719,
     "tempo": 150.14,
     "acousticness": 0.9589,
-    "mood": "energetic",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.5269,
     "instrumentalness": 0.2903,
-    "loudness": -12.31
+    "loudness": -12.31,
+    "mood_id": 0,
+    "confidence": 0.2933
   },
   {
     "id": "1QV6tiMFM6fSOKOGLMHYYg",
@@ -971,11 +1093,13 @@
     "danceability": 0.8658,
     "tempo": 118.99,
     "acousticness": 0.9936,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.4887,
     "instrumentalness": 0.1899,
-    "loudness": -11.55
+    "loudness": -11.55,
+    "mood_id": 3,
+    "confidence": 0.5667
   },
   {
     "id": "6HyiR5NsthQQjxZNOnEoV2",
@@ -990,7 +1114,9 @@
     "mood_vector": null,
     "speechiness": 0.4518,
     "instrumentalness": 0.1351,
-    "loudness": -12.28
+    "loudness": -12.28,
+    "mood_id": 3,
+    "confidence": 0.5333
   },
   {
     "id": "7g16wBmQ5IqMNPqyyqjZmR",
@@ -1001,11 +1127,13 @@
     "danceability": 0.7525,
     "tempo": 100.2,
     "acousticness": 0.9833,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.5664,
     "instrumentalness": 0.2482,
-    "loudness": -10.72
+    "loudness": -10.72,
+    "mood_id": 3,
+    "confidence": 0.54
   },
   {
     "id": "0kAZ3H6G9Zac4PMpmobMkj",
@@ -1016,11 +1144,13 @@
     "danceability": 0.7032,
     "tempo": 147.88,
     "acousticness": 0.9179,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.758,
     "instrumentalness": 0.4306,
-    "loudness": -12.09
+    "loudness": -12.09,
+    "mood_id": 0,
+    "confidence": 0.4767
   },
   {
     "id": "0tFRxPQHvAUMTbWYRJUo8R",
@@ -1031,11 +1161,13 @@
     "danceability": 0.8446,
     "tempo": 112.86,
     "acousticness": 0.9727,
-    "mood": "tense",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.5337,
     "instrumentalness": 0.2737,
-    "loudness": -12.2
+    "loudness": -12.2,
+    "mood_id": 3,
+    "confidence": 0.3667
   },
   {
     "id": "4gbVRS8gloEluzf0GzDOFc",
@@ -1046,11 +1178,13 @@
     "danceability": 0.8394,
     "tempo": 120.06,
     "acousticness": 0.8782,
-    "mood": "energetic",
+    "mood": "melancholic",
     "mood_vector": null,
     "speechiness": 0.6256,
     "instrumentalness": 0.3434,
-    "loudness": -14.2
+    "loudness": -14.2,
+    "mood_id": 2,
+    "confidence": 0.4
   },
   {
     "id": "425DfcjaZAB7PjP2KrCq5Q",
@@ -1065,7 +1199,9 @@
     "mood_vector": null,
     "speechiness": 0.4827,
     "instrumentalness": 0.2245,
-    "loudness": -10.28
+    "loudness": -10.28,
+    "mood_id": 3,
+    "confidence": 0.7
   },
   {
     "id": "77hIkkruDPGPQzbpr4c3wm",
@@ -1080,7 +1216,9 @@
     "mood_vector": null,
     "speechiness": 0.6148,
     "instrumentalness": 0.1845,
-    "loudness": -11.09
+    "loudness": -11.09,
+    "mood_id": 3,
+    "confidence": 0.6367
   },
   {
     "id": "3xVZYkcuWalGudeKl861wb",
@@ -1091,7 +1229,7 @@
     "danceability": 0.5678,
     "tempo": 164.04,
     "acousticness": 0.943,
-    "mood": "happy",
+    "mood": "melancholic",
     "mood_vector": {
       "happy": 0.429,
       "sad": 0.2429,
@@ -1101,7 +1239,9 @@
     },
     "speechiness": 0.5566,
     "instrumentalness": 0.3274,
-    "loudness": -15.01
+    "loudness": -15.01,
+    "mood_id": 2,
+    "confidence": 0.4467
   },
   {
     "id": "0mZriPjLPG9PExNzKQ3NVS",
@@ -1112,7 +1252,7 @@
     "danceability": 0.5993,
     "tempo": 78.03,
     "acousticness": 0.987,
-    "mood": "tense",
+    "mood": "chill",
     "mood_vector": {
       "happy": 0.5541,
       "sad": 0.1103,
@@ -1122,7 +1262,9 @@
     },
     "speechiness": 0.3731,
     "instrumentalness": 0.4606,
-    "loudness": -13.25
+    "loudness": -13.25,
+    "mood_id": 4,
+    "confidence": 0.61
   },
   {
     "id": "4WFfPxJv1KRekG6mxn837K",
@@ -1133,11 +1275,13 @@
     "danceability": 0.6351,
     "tempo": 149.86,
     "acousticness": 0.9926,
-    "mood": "happy",
+    "mood": "epic",
     "mood_vector": null,
     "speechiness": 0.5192,
     "instrumentalness": 0.3217,
-    "loudness": -13.14
+    "loudness": -13.14,
+    "mood_id": 0,
+    "confidence": 0.2967
   },
   {
     "id": "5cOXSOo4olhVLVSpQBvQaP",
@@ -1152,7 +1296,9 @@
     "mood_vector": null,
     "speechiness": 0.3616,
     "instrumentalness": 0.2007,
-    "loudness": -9.97
+    "loudness": -9.97,
+    "mood_id": 3,
+    "confidence": 0.47
   },
   {
     "id": "4blARE63d5cQU3cdxCbrBa",
@@ -1163,11 +1309,13 @@
     "danceability": 0.7802,
     "tempo": 124.93,
     "acousticness": 0.9929,
-    "mood": "energetic",
+    "mood": "melancholic",
     "mood_vector": null,
     "speechiness": 0.4016,
     "instrumentalness": 0.2027,
-    "loudness": -15.36
+    "loudness": -15.36,
+    "mood_id": 2,
+    "confidence": 0.46
   },
   {
     "id": "62yJjFtgkhUrXktIoSjgP2",
@@ -1182,7 +1330,9 @@
     "mood_vector": null,
     "speechiness": 0.4098,
     "instrumentalness": 0.35,
-    "loudness": -8.59
+    "loudness": -8.59,
+    "mood_id": 3,
+    "confidence": 0.38
   },
   {
     "id": "6pCp8j2MmywUs8vygmqNQ1",
@@ -1193,11 +1343,13 @@
     "danceability": 0.5444,
     "tempo": 152.58,
     "acousticness": 0.9866,
-    "mood": "energetic",
+    "mood": "melancholic",
     "mood_vector": null,
     "speechiness": 0.3162,
     "instrumentalness": 0.1612,
-    "loudness": -15.97
+    "loudness": -15.97,
+    "mood_id": 2,
+    "confidence": 0.51
   },
   {
     "id": "2yWlGEgEfPot0lv3OAjuG3",
@@ -1208,10 +1360,12 @@
     "danceability": 0.8027,
     "tempo": 129.59,
     "acousticness": 0.9717,
-    "mood": "energetic",
+    "mood": "happy",
     "mood_vector": null,
     "speechiness": 0.4657,
     "instrumentalness": 0.1588,
-    "loudness": -10.75
+    "loudness": -10.75,
+    "mood_id": 3,
+    "confidence": 0.61
   }
 ]
