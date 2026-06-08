@@ -115,6 +115,7 @@ def build_feature_matrix(access_token):
     all_tracks = {t["id"]: t for t in top_short + top_medium + recent + liked}
     unique_tracks = list(all_tracks.values())
     print(f"Total unique tracks: {len(unique_tracks)}")
+    
 
     print("Fetching audio features from freqblog...")
     matrix = []
@@ -179,8 +180,9 @@ def get_liked_songs(access_token, limit=2000):
         data = response.json()
 
         items = data.get("items", [])
+        print(f"  Page at offset {offset}: got {len(items)} items, response keys: {list(data.keys())}")  # ← add
         if not items:
-            break  # no more tracks
+            break
 
         for item in items:
             track = item["track"]
@@ -199,3 +201,4 @@ def get_liked_songs(access_token, limit=2000):
 
     print(f"Total liked songs fetched: {len(tracks)}")
     return tracks
+

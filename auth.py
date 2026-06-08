@@ -2,6 +2,7 @@ import os
 import urllib.parse
 import secrets
 import requests
+from recommender import generate_playlist
 from dotenv import load_dotenv
 from flask import Flask, redirect, request, session
 from spotify import build_feature_matrix
@@ -17,6 +18,7 @@ REDIRECT_URI  = os.getenv("SPOTIFY_REDIRECT_URI")
 SCOPES = " ".join([
     "user-read-recently-played",
     "user-top-read",
+    "user-library-read",        # ← add this
     "playlist-modify-public",
     "playlist-modify-private",
 ])
@@ -126,6 +128,30 @@ def logout():
         </body>
         </html>
     '''
+
+@app.route("/playlist/<mood>")
+def playlist(mood):
+    if "access_token" not in session:
+        return redirect("/login")
+
+    playlist_id = generate_playlist(session["access_token"], mood)
+
+    if not playlist_id:
+        return "Failed to generate playlist — check terminal for details.", 500
+
+    return f"""
+        <h2>🎵 {mood.capitalize()} playlist created!</h2>
+        <p>Open it in Spotify:</p>
+        <a href="spotify:playlist:{playlist_id}">Open in Spotify app</a>
+        <br><br>
+        <a href="https://open.spotify.com/playlist/{playlist_id}" target="_blank">
+            Open in browser
+        </a>
+        <br><br>
+        <p>Try another mood:</p>
+        {''.join(f'<a href="/playlist/{m}" style="margin-right:10px">{m}</a>'
+                  for m in ["happy", "epic", "melancholic", "energized", "chill"])}
+    """
 
 
 # ── Entry point ───────────────────────────────────────────────────────
