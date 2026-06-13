@@ -232,8 +232,7 @@ def assign_mood_names(profiles: dict) -> dict:
 
 
 MOOD_MERGE = {
-    "epic_instrumental": "energized",   # both epic clusters → same mood button
-    "epic": "energized",
+    "epic_instrumental": "epic",   # both epic clusters → same mood button
     "comedy":            None,     # None = drop entirely
 }
 
