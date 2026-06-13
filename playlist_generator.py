@@ -40,7 +40,7 @@ CLUSTER_NAMES = {
     1: "happy",
     2: "energized",   # ← was epic
     3: None,
-    4: "focus",
+    4: "focused",
     5: "energized",   # ← was epic
     6: None,
     7: "chill",
@@ -54,7 +54,7 @@ MOOD_LABEL_MAP = {
     "melancholic":"melancholic",
     "energized":  "energized",
     "chill":      "chill",
-    "focus": "focus"
+    "focused": "focused"
 }
 
 # Paths — update these if your folder layout differs.
@@ -143,18 +143,15 @@ X_scaled = scaler.transform(df[FEATURES].values)  # transform only, don't re-fit
 
 # Map integer cluster IDs → mood names using the cluster_names from the pkl
 # cluster_names looks like {0: "melancholic", 1: "happy", 2: "epic", ...}
-cluster_names = bundle.get("CLUSTER_NAMES", {})
-
 # Reverse it to a plain dict for .map()
-# Also apply mood_merge so epic_instrumental → epic, comedy → None
-# def resolve_mood(cluster_id):
-#     raw_name = cluster_names.get(int(cluster_id))   # e.g. "epic_instrumental"
-#     if raw_name is None:
-#         return None
-#     return mood_merge.get(raw_name, raw_name)        # e.g. "epic"
+cluster_names = bundle.get("cluster_names", {})
+mood_merge    = bundle.get("mood_merge", {})
 
 def resolve_mood(cluster_id):
-    return CLUSTER_NAMES.get(int(cluster_id)) 
+    raw = cluster_names.get(int(cluster_id))       # e.g. "epic_instrumental"
+    if raw is None:
+        return None
+    return mood_merge.get(raw, raw)  
 
 print("[playlist_generator] Classifying all tracks …")
 predicted_labels  = rf_model.predict(X_scaled)        # integers: 0,1,2...
@@ -202,9 +199,16 @@ VALID_MOODS = set(df["mood"].unique())
 
 
 def get_playlist_tracks(mood: str, n: int = 25) -> list[dict]:
-    """
+    """cluster_names = bundle.get("cluster_names", {})
+mood_merge    = bundle.get("mood_merge", {})
+
+def resolve_mood(cluster_id):
+    raw = cluster_names.get(int(cluster_id))       # e.g. "epic_instrumental"
+    if raw is None:
+        return None
+    return mood_merge.get(raw, raw)  
     Returns n tracks for the given mood using the 80/20 popularity/confidence split.
-    Valid moods: happy, epic, melancholic, energized, chill, focus
+    Valid moods: happy, epic, melancholic, energized, chill, focused
     """
     mood_key = mood.strip().lower()
     if mood_key not in VALID_MOODS:

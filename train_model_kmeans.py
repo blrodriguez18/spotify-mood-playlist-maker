@@ -99,7 +99,12 @@ def profile_clusters(df, labels, k):
         profiles[cid] = avg.to_dict()
         profiles[cid]["track_count"] = len(members)
 
-    return profiles, df
+    cluster_names = assign_mood_names(profiles)
+    print("\nAuto-assigned mood names:")
+    for cid, name in cluster_names.items():
+        print(f"  Cluster {cid}: {name}")
+
+    return profiles, df, cluster_names
 
 # ── 6. Train classifier on cluster labels ─────────────────────────────
 def train_classifier(df_labeled):
@@ -179,7 +184,7 @@ def assign_mood_names(profiles: dict) -> dict:
             "tempo": 120.6,   "acousticness": 0.270, "speechiness": 0.309,
             "instrumentalness": 0.023, "loudness": -7.1,
         },
-        "focus": {
+        "focused": {
             "valence": 0.181, "energy": 0.177, "danceability": 0.343,
             "tempo": 102.7,   "acousticness": 0.860, "speechiness": 0.051,
             "instrumentalness": 0.791, "loudness": -21.2,
@@ -227,7 +232,8 @@ def assign_mood_names(profiles: dict) -> dict:
 
 
 MOOD_MERGE = {
-    "epic_instrumental": "epic",   # both epic clusters → same mood button
+    "epic_instrumental": "energized",   # both epic clusters → same mood button
+    "epic": "energized",
     "comedy":            None,     # None = drop entirely
 }
 
