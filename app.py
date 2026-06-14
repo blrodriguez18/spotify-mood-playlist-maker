@@ -61,7 +61,7 @@ SPOTIFY_API_BASE     = "https://api.spotify.com/v1"
 CLIENT_ID     = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")   # used only in token exchange
 REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI", "http://127.0.0.1:3000/callback")
-SCOPES        = "playlist-modify-public playlist-modify-private"
+SCOPES = "playlist-modify-public playlist-modify-private user-read-private"
 
 
 # ──────────────────────────────────────────────
@@ -336,123 +336,101 @@ def generate(mood: str):
 
 @app.route("/save", methods=["POST"])
 def save_playlist():
-    """
-    Create a new Spotify playlist and add the tracks to it.
+    try:
+        if not _get_access_token():
+            return jsonify({"error": "Not authenticated. Please /login first."}), 401
 
-    Expected request body (JSON)
-    ─────────────────────────────
-    {
-        "mood":       "happy",
-        "track_names": ["Song Title", ...],   ← used for display only
-        "track_ids":   ["spotify:track:...", ...]  ← URIs to add
-    }
+        body = request.get_json(silent=True) or {}
+        mood       = body.get("mood", "unknown")
+        track_list = body.get("tracks", [])
 
-    Because our dataset.csv doesn't contain Spotify track URIs, we search
-    for each track by name + artist and resolve it to a URI here.
+        if not track_list:
+            return jsonify({"error": "No tracks provided"}), 400
 
-    Flow
-    ────
-    1. Verify the user is authenticated
-    2. Get the user's Spotify ID  (/me)
-    3. Create an empty playlist   (/users/{id}/playlists)
-    4. Search for each track      (/search)  → collect URIs
-    5. Add all URIs to playlist   (/playlists/{id}/tracks)
-    6. Return the playlist URL
+        # ── Step 1: get Spotify user ID ────────────
+        me_resp = _spotify_get("/me")
+        print("ME STATUS:", me_resp.status_code)
+        print("ME BODY:", me_resp.json())
 
-    Note: Spotify's /playlists/{id}/tracks accepts max 100 URIs per call.
-    We chunk the list to stay within that limit.
-    """
-    if not _get_access_token():
-        return jsonify({"error": "Not authenticated. Please /login first."}), 401
+        if me_resp.status_code != 200:
+            return jsonify({"error": "Could not fetch Spotify user profile"}), 502
+        user_id = me_resp.json()["id"]
 
-    body = request.get_json(silent=True) or {}
-    mood         = body.get("mood", "unknown")
-    track_list   = body.get("tracks", [])   # list of {track_name, artists, ...}
-
-    if not track_list:
-        return jsonify({"error": "No tracks provided"}), 400
-
-    # ── Step 1: get Spotify user ID ────────────
-    me_resp = _spotify_get("/me")
-    if me_resp.status_code != 200:
-        return jsonify({"error": "Could not fetch Spotify user profile"}), 502
-    user_id = me_resp.json()["id"]
-
-    # ── Step 2: create playlist ────────────────
-    playlist_name = f"{mood.capitalize()} Vibes 🎵"
-    create_resp   = _spotify_post(
-        f"/users/{user_id}/playlists",
-        json={
-            "name":        playlist_name,
-            "description": f"Auto-generated {mood} playlist — powered by ML",
-            "public":      True,
-        },
-    )
-    if create_resp.status_code not in (200, 201):
-        return jsonify({
-            "error":   "Could not create playlist",
-            "details": create_resp.json(),
-        }), 502
-
-    playlist_id  = create_resp.json()["id"]
-    playlist_url = create_resp.json()["external_urls"]["spotify"]
-
-    # ── Step 3: search for each track ─────────
-    # The CSV has track_name + artists but not Spotify URIs, so we search.
-    # We take the top result and trust it — for a personal tool this is fine.
-    uris     = []
-    not_found = []
-
-    for track in track_list:
-        name    = track.get("track_name", "")
-        artist  = track.get("artists",    "")
-
-        # Build a targeted query: track:"Song Name" artist:"Artist"
-        query = f'track:"{name}"'
-        if artist:
-            # Some entries have multiple artists separated by "; " — use only
-            # the first one for the search query to avoid over-constraining it.
-            first_artist = str(artist).split(";")[0].strip()
-            query += f' artist:"{first_artist}"'
-
-        search_resp = _spotify_get(
-            "/search",
-            params={"q": query, "type": "track", "limit": 1},
+        # ── Step 2: create playlist ────────────────
+        playlist_name = f"{mood.capitalize()} Vibes 🎵"
+        create_resp = _spotify_post(
+            f"/users/{user_id}/playlists",
+            json={
+                "name":        playlist_name,
+                "description": f"Auto-generated {mood} playlist — powered by ML",
+                "public":      True,
+            },
         )
+        print("CREATE STATUS:", create_resp.status_code)
+        print("CREATE BODY:", create_resp.json())
 
-        if search_resp.status_code == 200:
-            items = search_resp.json().get("tracks", {}).get("items", [])
-            if items:
-                uris.append(items[0]["uri"])
-            else:
-                not_found.append(name)
-        else:
-            not_found.append(name)
-
-    if not uris:
-        return jsonify({"error": "Could not resolve any tracks on Spotify"}), 404
-
-    # ── Step 4: add tracks (chunked at 100) ────
-    CHUNK_SIZE = 100
-    for i in range(0, len(uris), CHUNK_SIZE):
-        chunk = uris[i : i + CHUNK_SIZE]
-        add_resp = _spotify_post(
-            f"/playlists/{playlist_id}/tracks",
-            json={"uris": chunk},
-        )
-        if add_resp.status_code not in (200, 201):
+        if create_resp.status_code not in (200, 201):
             return jsonify({
-                "error":   "Failed to add tracks to playlist",
-                "details": add_resp.json(),
+                "error":   "Could not create playlist",
+                "details": create_resp.json(),
             }), 502
 
-    return jsonify({
-        "success":      True,
-        "playlist_url": playlist_url,
-        "playlist_name": playlist_name,
-        "tracks_added": len(uris),
-        "not_found":    not_found,   # tracks searched but not found on Spotify
-    })
+        playlist_id  = create_resp.json()["id"]
+        playlist_url = create_resp.json()["external_urls"]["spotify"]
+
+        # ── Step 3: search for each track ─────────
+        uris      = []
+        not_found = []
+
+        for track in track_list:
+            name   = track.get("track_name", "")
+            artist = track.get("artists", "")
+            query  = f'track:"{name}"'
+            if artist:
+                first_artist = str(artist).split(";")[0].strip()
+                query += f' artist:"{first_artist}"'
+
+            search_resp = _spotify_get(
+                "/search",
+                params={"q": query, "type": "track", "limit": 1},
+            )
+            if search_resp.status_code == 200:
+                items = search_resp.json().get("tracks", {}).get("items", [])
+                if items:
+                    uris.append(items[0]["uri"])
+                else:
+                    not_found.append(name)
+            else:
+                not_found.append(name)
+
+        if not uris:
+            return jsonify({"error": "Could not resolve any tracks on Spotify"}), 404
+
+        # ── Step 4: add tracks ─────────────────────
+        for i in range(0, len(uris), 100):
+            chunk    = uris[i:i+100]
+            add_resp = _spotify_post(
+                f"/playlists/{playlist_id}/tracks",
+                json={"uris": chunk},
+            )
+            if add_resp.status_code not in (200, 201):
+                return jsonify({
+                    "error":   "Failed to add tracks to playlist",
+                    "details": add_resp.json(),
+                }), 502
+
+        return jsonify({
+            "success":       True,
+            "playlist_url":  playlist_url,
+            "playlist_name": playlist_name,
+            "tracks_added":  len(uris),
+            "not_found":     not_found,
+        })
+
+    except Exception as e:
+        import traceback
+        print("SAVE ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 502
 
 
 # ──────────────────────────────────────────────
