@@ -297,8 +297,6 @@ let notePhase  = 0;
 let animFrame;
 let currentMood   = null;
 let currentTracks = [];
-const NUM_AMBIENT = 18;
-const ambientBubbles = Array.from({ length: NUM_AMBIENT }, () => new AmbientBubble());
 
 
 function resize() {
@@ -321,6 +319,9 @@ const orb = {
   pulseSpeed: 0.045,
 };
 
+const AMBIENT_COLORS = [
+  '#69A4EA', '#02FFFF', '#CCF368', '#F036A4', '#FA7482', '#FFC864'];
+
 /* ── BUBBLE CLASS ───────────────────────────────────── */
 class Bubble {
   constructor(mood, idx, total) {
@@ -335,8 +336,8 @@ class Bubble {
     this.vy     = (Math.random() - 0.5) * 4;
     this.r      = 68;
     this.phase  = Math.random() * Math.PI * 2;
-    this.driftX = (Math.random() - 0.5) * 0.8;
-    this.driftY = (Math.random() - 0.5) * 0.8;
+    this.driftX = (Math.random() - 0.5) * 1.5;
+    this.driftY = (Math.random() - 0.5) * 1.5;
     this.hovered = false;
     this.scale  = 0;
     this.born   = performance.now();
@@ -415,37 +416,75 @@ class Bubble {
 }
 
 class AmbientBubble {
-  constructor() {
-    this.reset(true);
+  constructor(idx, total) {
+    const angle   = (idx / total) * Math.PI * 2 + Math.PI / 6;
+    const dist    = Math.min(W, H) * (0.15 + Math.random() * 0.35);
+    this.x        = cx;
+    this.y        = cy;
+    this.tx       = cx + Math.cos(angle) * dist;
+    this.ty       = cy + Math.sin(angle) * dist;
+    this.vx       = (Math.random() - 0.5) * 4;
+    this.vy       = (Math.random() - 0.5) * 4;
+    this.r        = 12 + Math.random() * 22;
+    this.color    = AMBIENT_COLORS[idx % AMBIENT_COLORS.length];
+    this.phase    = Math.random() * Math.PI * 2;
+    this.driftX   = (Math.random() - 0.5) * 1.2;
+    this.driftY   = (Math.random() - 0.5) * 1.2;
+    this.scale    = 0;
+    this.born     = performance.now();
+    this.opacity  = 0.8 + Math.random() * 0.4;
   }
 
-  reset(initial = false) {
-    this.x  = Math.random() * W;
-    this.y  = initial ? Math.random() * H : H + 60;
-    this.r  = 8 + Math.random() * 28;
-    this.vx = (Math.random() - 0.5) * 0.4;
-    this.vy = -(0.3 + Math.random() * 0.6);
-    this.opacity = 0.04 + Math.random() * 0.10;
-    this.phase = Math.random() * Math.PI * 2;
+  update(t) {
+    const age  = (t - this.born) / 600;
+    this.scale = Math.min(1, age * age);
+
+    const spring = 0.04;
+    const damp   = 0.82;
+
+    this.vx += (this.tx - this.x) * spring;
+    this.vy += (this.ty - this.y) * spring;
+    this.vx *= damp;
+    this.vy *= damp;
+    this.x  += this.vx;
+    this.y  += this.vy;
+    this.tx += this.driftX;
+    this.ty += this.driftY;
+
+    const pad = this.r + 20;
+    if (this.tx < pad || this.tx > W - pad) this.driftX *= -1;
+    if (this.ty < pad || this.ty > H - pad) this.driftY *= -1;
   }
 
-  update() {
-    this.x += this.vx + Math.sin(this.phase + performance.now() * 0.0005) * 0.3;
-    this.y += this.vy;
-    if (this.y < -this.r * 2) this.reset();
-  }
+  draw(t) {
+    const floatY = Math.sin(this.phase + t * 0.0008) * 4;
+    const r      = this.r * this.scale;
 
-  draw() {
     ctx.save();
-    ctx.globalAlpha = this.opacity;
+    ctx.translate(this.x, this.y + floatY);
+
+    // fill opacity
+    ctx.globalAlpha = 0.4 * this.scale;  // ← change this
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.strokeStyle = '#e8e0d0';
-    ctx.lineWidth   = 0.5;
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+
+    // stroke opacity
+    ctx.globalAlpha = 0.8 * this.scale;   // ← change this
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth   = 1.2;
     ctx.stroke();
+
     ctx.restore();
   }
 }
+
+// const NUM_AMBIENT = 18;
+// const ambientBubbles = Array.from({ length: NUM_AMBIENT }, () => new AmbientBubble());
+let ambientBubbles = [];
 
 /* ── DRAW IDLE (centre orb only) ────────────────────── */
 // function drawIdle() {
@@ -488,52 +527,46 @@ class AmbientBubble {
 function loop(t) {
   animFrame = requestAnimationFrame(loop);
   ctx.clearRect(0, 0, W, H);
-  
-  // always draw ambient bubbles first
-  ambientBubbles.forEach(b => { b.update(); b.draw(); });
 
   if (!exploded) {
-    // draw orb inline (no clearRect here)
+    // orb only
     const pulse = Math.sin(t * orb.pulseSpeed * 0.1) * orb.pulseAmp;
     const r     = orb.r + pulse;
-
     ctx.save();
     ctx.translate(cx, cy);
-
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(232,224,208,0.05)';
     ctx.fill();
-
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(232,224,208,0.8)';
     ctx.lineWidth   = 0.8;
     ctx.stroke();
-
     ctx.beginPath();
     ctx.arc(0, 0, r + 14 + pulse * 0.5, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(232,224,208,1)';
     ctx.lineWidth   = 0.5;
     ctx.stroke();
-
     ctx.fillStyle    = 'rgba(232,224,208,1)';
     ctx.font         = '32px serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('♪', 0, 2);
-
     ctx.restore();
     return;
   }
 
-  // exploded state — mood bubbles
+  // ambient decorative bubbles (behind mood bubbles)
+  ambientBubbles.forEach(b => { b.update(t); b.draw(t); });
+
+  // mood bubbles on top
   bubbles.forEach(b => b.update(t));
   bubbles.forEach(b => b.draw(t));
 
+  // faint centre orb remnant
   const pulse = Math.sin(t * orb.pulseSpeed * 0.1) * (orb.pulseAmp * 0.5);
   const r     = (orb.r * 0.6) + pulse;
-
   ctx.save();
   ctx.translate(cx, cy);
   ctx.beginPath();
@@ -548,18 +581,18 @@ function loop(t) {
 function explode() {
   if (exploded) return;
   exploded = true;
-
   document.getElementById('hint').style.opacity = '0';
-
-  bubbles = MOODS.map((mood, i) => new Bubble(mood, i, MOODS.length));
+  bubbles         = MOODS.map((mood, i) => new Bubble(mood, i, MOODS.length));
+  ambientBubbles  = Array.from({ length: 14 }, (_, i) => new AmbientBubble(i, 14));
   cancelAnimationFrame(animFrame);
   animFrame = requestAnimationFrame(loop);
 }
 
 /* ── COLLAPSE BACK ───────────────────────────────────── */
 function collapse() {
-  exploded = false;
-  bubbles  = [];
+  exploded       = false;
+  bubbles        = [];
+  ambientBubbles = [];
   cancelAnimationFrame(animFrame);
   document.getElementById('hint').style.opacity = '1';
   animFrame = requestAnimationFrame(loop);
