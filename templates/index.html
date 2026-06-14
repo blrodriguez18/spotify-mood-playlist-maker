@@ -29,6 +29,7 @@
       --melancholic:  #6a8fc8;
       --energized:    #3ecf72;
       --chill:        #b07ce8;
+      --focused:        #e05c3a;
 
       --active-accent: var(--happy); /* updated by JS */
 
@@ -200,6 +201,7 @@
     .mood-btn[data-mood="melancholic"]{ --btn-color: var(--melancholic); }
     .mood-btn[data-mood="energized"]  { --btn-color: var(--energized); }
     .mood-btn[data-mood="chill"]      { --btn-color: var(--chill); }
+    .mood-btn[data-mood="focused"]    { --btn-color: var(--focused); }
 
     .mood-btn::after { background: var(--btn-color); }
 
@@ -559,6 +561,9 @@
     <button class="mood-btn" data-mood="chill">
       <span class="emoji">🌙</span>Chill
     </button>
+    <button class="mood-btn" data-mood="focused">
+      <span class="emoji">🎯</span>Focused
+    </button>
   </div>
 
   <!-- ── STATUS BAR ─────────────────────────── -->
@@ -616,7 +621,7 @@
     melancholic: '#6a8fc8',
     energized:   '#3ecf72',
     chill:       '#b07ce8',
-    focus:       '#4ec9b0',   // ← add this
+    focused:       '#4ec9b0',   // ← add this
 };
 
   const MOOD_LABELS = {
@@ -625,7 +630,7 @@
     melancholic: 'MELANCHOLIC',
     energized:   'ENERGIZED',
     chill:       'CHILL SESSION',
-    focus:       'DEEP FOCUS',  // ← add this
+    focused:       'DEEP FOCUS',  // ← add this
 };
 
   let currentMood   = null;
