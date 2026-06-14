@@ -148,7 +148,7 @@
 
     .track-row {
       display: grid;
-      grid-template-columns: 32px 1fr 60px 60px 80px;
+      grid-template-columns: 32px 1fr 60px 60px 80px 36px;  /* ← add 36px */
       align-items: center;
       gap: 16px;
       padding: 12px 0;
@@ -238,6 +238,42 @@
       vertical-align: middle;
       margin-right: 8px;
     }
+
+    .track-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .play-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 0.5px solid rgba(232,224,208,0.3);
+      background: transparent;
+      color: rgba(232,224,208,0.6);
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .play-btn:hover { border-color: rgba(232,224,208,0.8); color: #e8e0d0; }
+    .play-btn.playing { background: #1DB954; border-color: #1DB954; color: #000; }
+    .play-btn.loading { opacity: 0.4; cursor: wait; }
+
+    .spotify-link {
+      font-size: 16px;
+      text-decoration: none;
+      opacity: 0.4;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+
+    .spotify-link:hover { opacity: 1; }
 
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -671,17 +707,20 @@ async function triggerMood(mood) {
         <div></div>
       </div>
       ${data.tracks.map((t, i) => `
-        <div class="track-row">
+        <div class="track-row" id="row-${i}">
           <div class="track-num">${i + 1}</div>
           <div class="track-info">
             <div class="track-name">${esc(t.track_name || '—')}</div>
-            <div class="track-artist">${esc(t.artists || '—')}</div>
+            <div class="track-artist">${esc(t.artists ? t.artists.replace(/;/g, ', ') : '—')}</div>
           </div>
           <div class="track-pop">${t.popularity || 0}</div>
           <div class="track-conf">${t.confidence != null ? (t.confidence * 100).toFixed(0) + '%' : '—'}</div>
           <div>${i < cutoff
             ? '<span class="badge badge-pop">Popular</span>'
             : '<span class="badge badge-ml">ML pick</span>'}</div>
+          <div class="track-actions" id="actions-${i}">
+            <button class="play-btn" onclick="togglePreview(${i}, '${esc(t.track_name || '')}', '${esc((t.artists || '').split(';')[0].trim())}')" title="Preview">▶</button>
+          </div>
         </div>`).join('')}
     `;
 
@@ -772,6 +811,105 @@ function esc(s) {
 }
 
 animFrame = requestAnimationFrame(loop);
+
+// ── PREVIEW PLAYER ────────────────────────────────────
+let currentAudio   = null;
+let currentPlayBtn = null;
+let currentRowIdx  = null;
+
+async function togglePreview(idx, trackName, artist) {
+  const btn = document.querySelector(`#row-${idx} .play-btn`);
+
+  // If clicking the currently playing track — stop it
+  if (currentRowIdx === idx && currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+    btn.textContent = '▶';
+    btn.classList.remove('playing');
+    currentRowIdx = null;
+    return;
+  }
+
+  // Stop any currently playing track
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+    if (currentPlayBtn) {
+      currentPlayBtn.textContent = '▶';
+      currentPlayBtn.classList.remove('playing');
+    }
+  }
+
+  // Show loading state
+  btn.textContent = '…';
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch(`/preview?name=${encodeURIComponent(trackName)}&artist=${encodeURIComponent(artist)}`);
+    const data = await resp.json();
+
+    // Always add Spotify link regardless of preview availability
+    const actionsDiv = document.getElementById(`actions-${idx}`);
+    if (data.spotify_url && !actionsDiv.querySelector('.spotify-link')) {
+      const link = document.createElement('a');
+      link.href      = data.spotify_url;
+      link.target    = '_blank';
+      link.rel       = 'noopener';
+      link.className = 'spotify-link';
+      link.title     = 'Open in Spotify';
+      link.textContent = '↗';
+      actionsDiv.appendChild(link);
+    }
+
+    if (!data.preview_url) {
+      // No preview available — just show Spotify link
+      btn.textContent = '—';
+      btn.classList.remove('loading');
+      btn.disabled    = true;
+      btn.title       = 'No preview available';
+      return;
+    }
+
+    // Play the preview
+    currentAudio   = new Audio(data.preview_url);
+    currentPlayBtn = btn;
+    currentRowIdx  = idx;
+
+    currentAudio.play();
+    btn.textContent = '■';
+    btn.classList.remove('loading');
+    btn.classList.add('playing');
+    btn.disabled = false;
+
+    // When preview ends naturally
+    currentAudio.addEventListener('ended', () => {
+      btn.textContent = '▶';
+      btn.classList.remove('playing');
+      currentAudio  = null;
+      currentRowIdx = null;
+    });
+
+  } catch (err) {
+    btn.textContent = '▶';
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    console.error('Preview error:', err);
+  }
+}
+
+// Stop audio when closing playlist view
+const _origClose = closePlaylist;
+closePlaylist = function() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio  = null;
+    currentRowIdx = null;
+  }
+  _origClose();
+};
+
+
 </script>
 </body>
 </html>

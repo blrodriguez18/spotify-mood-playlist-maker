@@ -486,6 +486,38 @@ def export_playlist():
         download_name=filename,
     )
 
+
+@app.route("/preview")
+def get_preview():
+    name   = request.args.get("name", "")
+    artist = request.args.get("artist", "")
+
+    if not name:
+        return jsonify({"preview_url": None}), 200
+
+    first_artist = str(artist).split(";")[0].strip()
+    query = f'track:"{name}" artist:"{first_artist}"'
+
+    search_resp = _spotify_get(
+        "/search",
+        params={"q": query, "type": "track", "limit": 1},
+    )
+
+    if search_resp.status_code != 200:
+        return jsonify({"preview_url": None}), 200
+
+    items = search_resp.json().get("tracks", {}).get("items", [])
+    if not items:
+        return jsonify({"preview_url": None}), 200
+
+    track     = items[0]
+    return jsonify({
+        "preview_url":  track.get("preview_url"),
+        "spotify_url":  track["external_urls"]["spotify"],
+        "spotify_uri":  track["uri"],
+    })
+
+
 # ──────────────────────────────────────────────
 # 6.  RUN
 # ──────────────────────────────────────────────
