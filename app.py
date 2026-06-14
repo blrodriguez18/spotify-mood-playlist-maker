@@ -49,6 +49,9 @@ load_dotenv()  # reads .env into os.environ
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", secrets.token_hex(32))
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"]   = False
+app.config["SESSION_COOKIE_HTTPONLY"] = True
 # ⚠️  If secret_key changes between restarts (when FLASK_SECRET_KEY isn't set),
 #     existing sessions become invalid.  Always set FLASK_SECRET_KEY in .env.
 
@@ -62,7 +65,6 @@ CLIENT_ID     = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")   # used only in token exchange
 REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI", "http://127.0.0.1:3000/callback")
 SCOPES = "playlist-modify-public playlist-modify-private user-read-private"
-
 
 # ──────────────────────────────────────────────
 # 2.  PKCE HELPERS
@@ -351,6 +353,15 @@ def save_playlist():
         me_resp = _spotify_get("/me")
         print("ME STATUS:", me_resp.status_code)
         print("ME BODY:", me_resp.json())
+        import base64, json as _json
+        token = _get_access_token()
+        try:
+            payload = token.split('.')[1]
+            payload += '=' * (4 - len(payload) % 4)  # fix padding
+            decoded = _json.loads(base64.urlsafe_b64decode(payload))
+            print("TOKEN PAYLOAD:", decoded)
+        except Exception as ex:
+            print("Could not decode token:", ex)
 
         if me_resp.status_code != 200:
             return jsonify({"error": "Could not fetch Spotify user profile"}), 502
@@ -359,11 +370,11 @@ def save_playlist():
         # ── Step 2: create playlist ────────────────
         playlist_name = f"{mood.capitalize()} Vibes 🎵"
         create_resp = _spotify_post(
-            f"/users/{user_id}/playlists",
+            "/me/playlists", 
             json={
                 "name":        playlist_name,
                 "description": f"Auto-generated {mood} playlist — powered by ML",
-                "public":      True,
+                "public":      False,
             },
         )
         print("CREATE STATUS:", create_resp.status_code)
@@ -394,25 +405,34 @@ def save_playlist():
                 "/search",
                 params={"q": query, "type": "track", "limit": 1},
             )
+            # print(f"SEARCH '{name}': status={search_resp.status_code}")
             if search_resp.status_code == 200:
                 items = search_resp.json().get("tracks", {}).get("items", [])
                 if items:
-                    uris.append(items[0]["uri"])
+                    uri = items[0]["uri"]
+                    print(f"  FOUND: {uri} — {items[0]['name']}")
+                    uris.append(uri)
                 else:
                     not_found.append(name)
-            else:
-                not_found.append(name)
 
         if not uris:
             return jsonify({"error": "Could not resolve any tracks on Spotify"}), 404
 
         # ── Step 4: add tracks ─────────────────────
+        # Check what scopes the token actually has
+        scope_resp = _spotify_get("/me")
+        print("TOKEN SCOPES:", scope_resp.headers.get("X-OAuth-Scopes", "not found"))
+        print("GRANTED SCOPES:", scope_resp.headers.get("X-Accepted-OAuth-Scopes", "not found"))
+        print(f"Total URIs to add: {len(uris)}")
+        print("First 3 URIs:", uris[:3])
         for i in range(0, len(uris), 100):
             chunk    = uris[i:i+100]
             add_resp = _spotify_post(
                 f"/playlists/{playlist_id}/tracks",
                 json={"uris": chunk},
             )
+            print(f"ADD STATUS: {add_resp.status_code}")  # ← add this
+            print(f"ADD BODY: {add_resp.json()}")
             if add_resp.status_code not in (200, 201):
                 return jsonify({
                     "error":   "Failed to add tracks to playlist",
@@ -432,6 +452,39 @@ def save_playlist():
         print("SAVE ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 502
 
+
+
+from flask import send_file
+import io
+
+@app.route("/export", methods=["POST"])
+def export_playlist():
+    body      = request.get_json(silent=True) or {}
+    mood      = body.get("mood", "playlist")
+    tracks    = body.get("tracks", [])
+
+    if not tracks:
+        return jsonify({"error": "No tracks provided"}), 400
+
+    # Build M3U content
+    lines = ["#EXTM3U", f"#PLAYLIST:{mood.capitalize()} Vibes"]
+    for t in tracks:
+        name   = t.get("track_name", "Unknown")
+        artist = t.get("artists", "Unknown")
+        lines.append(f"#EXTINF:-1,{artist} - {name}")
+        lines.append(f"# spotify search: {artist} {name}")
+
+    m3u_content = "\n".join(lines)
+    buffer = io.BytesIO(m3u_content.encode("utf-8"))
+    buffer.seek(0)
+
+    filename = f"{mood}_vibes.m3u"
+    return send_file(
+        buffer,
+        mimetype="audio/x-mpegurl",
+        as_attachment=True,
+        download_name=filename,
+    )
 
 # ──────────────────────────────────────────────
 # 6.  RUN

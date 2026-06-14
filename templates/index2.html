@@ -268,7 +268,7 @@
   </div> 
   <div id="track-list"></div>
   <div id="save-row">
-    <button id="save-btn" disabled onclick="savePlaylist()">Save to Spotify</button>
+    <button id="save-btn" disabled onclick="savePlaylist()">Download Playlist ↓</button>
     <span id="save-hint">
       {% if not logged_in %}Connect Spotify to save playlists{% endif %}
     </span>
@@ -722,26 +722,36 @@ async function savePlaylist() {
 
   saveBtn.disabled  = true;
   status.className  = '';
-  status.innerHTML  = '<span class="spinner-inline"></span>Creating playlist on Spotify…';
+  status.innerHTML  = '<span class="spinner-inline"></span>Generating playlist file…';
 
   try {
-    const resp = await fetch('/save', {
+    const resp = await fetch('/export', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ mood: currentMood.id, tracks: currentTracks }),
     });
-    const data = await resp.json();
 
     if (!resp.ok) {
+      const data = await resp.json();
       status.className   = 'error';
-      status.textContent = data.error || 'Save failed.';
+      status.textContent = data.error || 'Export failed.';
       saveBtn.disabled   = false;
       return;
     }
 
+    // Trigger file download
+    const blob     = await resp.blob();
+    const url      = URL.createObjectURL(blob);
+    const a        = document.createElement('a');
+    a.href         = url;
+    a.download     = `${currentMood.id}_vibes.m3u`;
+    a.click();
+    URL.revokeObjectURL(url);
+
     status.className   = 'success';
-    status.textContent = `"${data.playlist_name}" saved · ${data.tracks_added} tracks added`;
-    saveHint.innerHTML = `<a href="${data.playlist_url}" target="_blank" rel="noopener">▶ Open in Spotify</a>`;
+    status.textContent = 'Playlist file downloaded!';
+    saveHint.innerHTML = 'Open the .m3u file to import into Spotify or any music player';
+    saveBtn.disabled   = false;
 
   } catch (err) {
     status.className   = 'error';
