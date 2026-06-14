@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, silhouette_score
 import pickle
 
+np.random.seed(42)
+
 FEATURES = ["valence", "energy", "danceability", "tempo",
             "acousticness", "speechiness", "instrumentalness", "loudness"]
 
@@ -38,7 +40,7 @@ def find_best_k(X, k_min=4, k_max=9):
 
     for k in range(k_min, k_max + 1):
         km = MiniBatchKMeans(n_clusters=k, random_state=42,
-                             batch_size=4096, n_init=10)
+                             batch_size=4096, n_init=25)
         labels = km.fit_predict(X)
 
         # Silhouette on full 114k is slow — sample 10k for speed
@@ -51,13 +53,14 @@ def find_best_k(X, k_min=4, k_max=9):
             best_k = k
 
     print(f"\nBest k: {best_k}  (score: {best_score:.4f})")
-    return best_k
+    # return best_k
+    return 8
 
 # ── 4. Train final KMeans ─────────────────────────────────────────────
 def cluster(X, k):
     print(f"\nTraining final KMeans with k={k}...")
     km = MiniBatchKMeans(n_clusters=k, random_state=42,
-                         batch_size=4096, n_init=10)
+                         batch_size=4096, n_init=25)
     labels = km.fit_predict(X)
     return km, labels
 

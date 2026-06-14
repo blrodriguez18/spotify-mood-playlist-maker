@@ -201,17 +201,6 @@ print("VALID MOODS:", VALID_MOODS)
 
 
 def get_playlist_tracks(mood: str, n: int = 25) -> list[dict]:
-    """cluster_names = bundle.get("cluster_names", {})
-mood_merge    = bundle.get("mood_merge", {})
-
-def resolve_mood(cluster_id):
-    raw = cluster_names.get(int(cluster_id))       # e.g. "epic_instrumental"
-    if raw is None:
-        return None
-    return mood_merge.get(raw, raw)  
-    Returns n tracks for the given mood using the 80/20 popularity/confidence split.
-    Valid moods: happy, epic, melancholic, energized, chill, focused
-    """
     mood_key = mood.strip().lower()
     if mood_key not in VALID_MOODS:
         raise ValueError(f"Unknown mood '{mood}'. Valid options: {', '.join(sorted(VALID_MOODS))}")
@@ -220,33 +209,27 @@ def resolve_mood(cluster_id):
 
     pool = df[df["mood"] == mood_key].copy()
 
+    # Deduplicate by track name + artist — keep highest confidence per track
+    pool = (pool.sort_values("confidence", ascending=False)
+                .drop_duplicates(subset=["track_name", "artists"])
+                .reset_index(drop=True))
+
     if len(pool) < n:
-        raise RuntimeError(
-            f"Only {len(pool)} tracks for '{mood_key}', but {n} requested."
-        )
+        raise RuntimeError(f"Only {len(pool)} tracks for '{mood_key}', but {n} requested.")
 
     n_popular   = math.ceil(n * 0.80)
     n_confident = n - n_popular
 
-    top_popular = (
-        pool.sort_values("popularity", ascending=False)
-            .head(n_popular)
-    )
+    top_popular = pool.sort_values("popularity", ascending=False).head(n_popular)
+    top_confident = (pool[~pool.index.isin(set(top_popular.index))]
+                        .sort_values("confidence", ascending=False)
+                        .head(n_confident))
 
-    top_confident = (
-        pool[~pool.index.isin(set(top_popular.index))]
-            .sort_values("confidence", ascending=False)
-            .head(n_confident)
-    )
-
-    playlist_df = (
-        pd.concat([top_popular, top_confident])
-          .sample(frac=1, random_state=42)
-          .reset_index(drop=True)
-    )
+    playlist_df = (pd.concat([top_popular, top_confident])
+                     .sample(frac=1, random_state=None) 
+                     .reset_index(drop=True))
 
     return playlist_df.where(pd.notnull(playlist_df), None).to_dict(orient="records")
-
 
 # ──────────────────────────────────────────────
 # 4.  QUICK SMOKE-TEST  (python playlist_generator.py)
