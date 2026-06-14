@@ -194,7 +194,7 @@ def _spotify_post(endpoint: str, **kwargs) -> requests.Response:
 def index():
     """Serve the single-page frontend."""
     logged_in = bool(_get_access_token())
-    return render_template("index.html", logged_in=logged_in)
+    return render_template("index2.html", logged_in=logged_in)
 
 
 @app.route("/login")

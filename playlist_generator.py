@@ -54,7 +54,8 @@ MOOD_LABEL_MAP = {
     "melancholic":"melancholic",
     "energized":  "energized",
     "chill":      "chill",
-    "focused": "focused"
+    "focused": "focused",
+    "epic": "epic"
 }
 
 # Paths — update these if your folder layout differs.
@@ -196,6 +197,7 @@ for cid in sorted(df["predicted_mood"].unique()):
 
 # Valid moods are now derived from the data, not hardcoded
 VALID_MOODS = set(df["mood"].unique())
+print("VALID MOODS:", VALID_MOODS)
 
 
 def get_playlist_tracks(mood: str, n: int = 25) -> list[dict]:
