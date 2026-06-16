@@ -59,6 +59,7 @@
       pointer-events: auto;
       transition: all 0.2s;
     }
+
     #auth-btn:hover { color: rgba(232,224,208,1); border-color: rgba(232,224,208,0.35); }
     #auth-btn.connected { color: #3ecf72; border-color: rgba(62,207,114,0.4); }
 
@@ -77,7 +78,6 @@
       transition: opacity 0.5s;
     }
 
-    /* ── PLAYLIST VIEW ── */
     #playlist-view {
       position: fixed;
       inset: 0;
@@ -85,9 +85,10 @@
       z-index: 20;
       display: none;
       flex-direction: column;
-      padding: 0 256px 32px 256px;
+      padding: 0 256px 32px 256px;   
       overflow-y: auto;
     }
+
     #playlist-view.visible { display: flex; }
 
     #playlist-header {
@@ -95,14 +96,16 @@
       flex-direction: column;
       align-items: baseline;
       justify-content: space-between;
+      margin-bottom: 32px;
       flex-shrink: 0;
-      position: sticky;
-      top: 0;
-      background: #400074;
-      padding-top: 60px;
-      padding-bottom: 32px;
-      z-index: 2;
+      position: sticky;        /* ← add */
+      top: 0;                  /* ← add */
+      background: #400074;     /* ← add — covers tracks scrolling behind it */
+      padding-top: 60px;       /* ← add — replaces the playlist-view top padding */
+      padding-bottom: 32px;    /* ← add */
+      z-index: 2;              /* ← add */
     }
+
 
     #playlist-mood-title {
       font-family: 'Space Mono', monospace;
@@ -124,25 +127,28 @@
       border-radius: 2px;
       cursor: pointer;
       transition: all 0.2s;
-      margin-top: 16px;
     }
+
     #back-btn:hover { color: #e8e0d0; border-color: rgba(232,224,208,0.5); }
 
     #status-bar {
       font-family: 'Space Mono', monospace;
       font-size: 14px;
       color: rgba(232,224,208,0.6);
-      padding-top: 12px;
+      margin-bottom: 24px;
+      padding-top: 24px;
       letter-spacing: 0.06em;
+      flex-shrink: 0;
     }
-    #status-bar.error   { color: #e05c3a; }
+
+    #status-bar.error { color: #e05c3a; }
     #status-bar.success { color: #3ecf72; }
 
     #track-list { flex: 1; }
 
     .track-row {
       display: grid;
-      grid-template-columns: 32px 1fr 60px 60px 80px;
+      grid-template-columns: 32px 1fr 60px 60px 80px 36px;  /* ← add 36px */
       align-items: center;
       gap: 16px;
       padding: 12px 0;
@@ -156,10 +162,18 @@
       text-align: right;
     }
 
-    .track-name   { font-size: 18px; font-weight: 400; color: #e8e0d0; }
+    .track-info {}
+    .track-name { font-size: 18px; font-weight: 400; color: #e8e0d0; }
     .track-artist { font-size: 13px; color: rgba(232,224,208,0.7); margin-top: 2px; }
 
-    .track-pop, .track-conf {
+    .track-pop {
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      color: rgba(232,224,208,0.6);
+      text-align: center;
+    }
+
+    .track-conf {
       font-family: 'Space Mono', monospace;
       font-size: 16px;
       color: rgba(232,224,208,0.6);
@@ -175,14 +189,15 @@
       text-transform: uppercase;
       text-align: center;
     }
-    .badge-pop { background: rgba(62,207,114,0.1);  color: #3ecf72; border: 0.5px solid rgba(62,207,114,0.2); }
+
+    .badge-pop { background: rgba(62,207,114,0.1); color: #3ecf72; border: 0.5px solid rgba(62,207,114,0.2); }
     .badge-ml  { background: rgba(176,124,232,0.1); color: #b07ce8; border: 0.5px solid rgba(176,124,232,0.2); }
 
     #save-row {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 32px;
+      align-items: center;
+      gap: 16px;
+      margin-top: 4px;
       flex-shrink: 0;
     }
 
@@ -198,19 +213,19 @@
       border-radius: 2px;
       cursor: pointer;
       transition: all 0.2s;
-      align-self: flex-start;
     }
-    #save-btn:hover    { background: #fff; }
+
+    #save-btn:hover { background: #fff; }
     #save-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
     #save-hint {
       font-family: 'Space Mono', monospace;
-      font-size: 13px;
-      color: rgba(232,224,208,0.5);
-      letter-spacing: 0.04em;
-      line-height: 1.7;
+      font-size: 14px;
+      color: rgba(232,224,208,0.6);
+      letter-spacing: 0.06em;
     }
-    #save-hint a       { color: #3ecf72; text-decoration: none; }
+
+    #save-hint a { color: #3ecf72; text-decoration: none; }
     #save-hint a:hover { text-decoration: underline; }
 
     .spinner-inline {
@@ -223,6 +238,13 @@
       vertical-align: middle;
       margin-right: 8px;
     }
+
+    .track-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -241,20 +263,21 @@
 
 <canvas id="c"></canvas>
 
+<!-- ── PLAYLIST VIEW ─────────────────────────────────── -->
 <div id="playlist-view">
   <div id="playlist-header">
     <div style="display:flex; align-items:baseline; justify-content:space-between; width:100%;">
       <div id="playlist-mood-title">—</div>
       <button id="back-btn" onclick="closePlaylist()">← back</button>
     </div>
-    <div id="status-bar">—</div>
-  </div>
-
+    <div id="status-bar" style="margin-bottom:0; margin-top:8px;">—</div>
+  </div> 
   <div id="track-list"></div>
-
   <div id="save-row">
     <button id="save-btn" disabled onclick="savePlaylist()">Download Playlist ↓</button>
-    <span id="save-hint"></span>
+    <span id="save-hint">
+      {% if not logged_in %}Connect Spotify to save playlists{% endif %}
+    </span>
   </div>
 </div>
 
@@ -262,29 +285,25 @@
 const IS_LOGGED_IN = {{ 'true' if logged_in else 'false' }};
 
 const MOODS = [
-  { id: 'happy',      label: 'Happy',      color: '#CCF368' },
-  { id: 'epic',       label: 'Epic',        color: '#F036A4' },
-  { id: 'melancholic',label: 'Melancholic', color: '#69A4EA' },
-  { id: 'energized',  label: 'Energized',   color: '#FFC864' },
-  { id: 'chill',      label: 'Chill',       color: '#02FFFF' },
-  { id: 'focused',    label: 'Focus',       color: '#FA7482' },
-];
-
-const AMBIENT_COLORS = [
-  '#CCF368','#F036A4','#69A4EA','#FFC864','#02FFFF','#FA7482',
-  '#ffffff','#b07ce8','#ff6b35','#3ecf72',
+  { id: 'happy',      label: 'Happy',       color: '#CCF368', note: '♪' },
+  { id: 'epic',       label: 'Epic',         color: '#F036A4', note: '♩' },
+  { id: 'melancholic',label: 'Melancholic',  color: '#69A4EA', note: '♫' },
+  { id: 'energized',  label: 'Energized',    color: '#FFC864', note: '♬' },
+  { id: 'chill',      label: 'Chill',        color: '#02FFFF', note: '♪' },
+  { id: 'focused',      label: 'Focus',        color: '#FA7482', note: '♩' },
 ];
 
 const canvas = document.getElementById('c');
 const ctx    = canvas.getContext('2d');
 
 let W, H, cx, cy;
-let exploded  = false;
-let bubbles   = [];
+let exploded   = false;
+let bubbles    = [];
+let notePhase  = 0;
 let animFrame;
 let currentMood   = null;
 let currentTracks = [];
-let ambientBubbles = [];
+
 
 function resize() {
   W = canvas.width  = window.innerWidth;
@@ -292,12 +311,24 @@ function resize() {
   cx = W / 2;
   cy = H / 2;
 }
-window.addEventListener('resize', resize);
+
+// window.addEventListener('resize', () => { resize(); if (!exploded) drawIdle(); });
+window.addEventListener('resize', () => { resize(); });
 resize();
 
-const orb = { r: 54, pulseAmp: 6, pulseSpeed: 0.045 };
 
-/* ── MOOD BUBBLE ── */
+/* ── CENTRE ORB ─────────────────────────────────────── */
+const orb = {
+  x: 0, y: 0,
+  r: 54,
+  pulseAmp: 6,
+  pulseSpeed: 0.045,
+};
+
+const AMBIENT_COLORS = [
+  '#69A4EA', '#02FFFF', '#CCF368', '#F036A4', '#FA7482', '#FFC864'];
+
+/* ── BUBBLE CLASS ───────────────────────────────────── */
 class Bubble {
   constructor(mood, idx, total) {
     const angle = (idx / total) * Math.PI * 2 - Math.PI / 2;
@@ -311,67 +342,85 @@ class Bubble {
     this.vy     = (Math.random() - 0.5) * 4;
     this.r      = 68;
     this.phase  = Math.random() * Math.PI * 2;
-    this.driftX = (Math.random() - 0.5) * 0.8;
-    this.driftY = (Math.random() - 0.5) * 0.8;
+    this.driftX = (Math.random() - 0.5) * 1.5;
+    this.driftY = (Math.random() - 0.5) * 1.5;
     this.hovered = false;
     this.scale  = 0;
     this.born   = performance.now();
   }
 
   update(t) {
-    const age  = (t - this.born) / 600;
+    const age = (t - this.born) / 600;
     this.scale = Math.min(1, age * age);
-    const spring = 0.08, damp = 0.78;
+
+    const spring = 0.08;
+    const damp   = 0.78;
+
     this.vx += (this.tx - this.x) * spring;
     this.vy += (this.ty - this.y) * spring;
     this.vx *= damp;
     this.vy *= damp;
-    this.x  += this.vx;
-    this.y  += this.vy;
+
+    this.x += this.vx;
+    this.y += this.vy;
+
     this.tx += this.driftX;
     this.ty += this.driftY;
+
     const pad = this.r + 20;
     if (this.tx < pad || this.tx > W - pad) this.driftX *= -1;
     if (this.ty < pad || this.ty > H - pad) this.driftY *= -1;
+
     bubbles.forEach(b => {
       if (b === this) return;
-      const dx = this.x - b.x, dy = this.y - b.y;
-      const d  = Math.sqrt(dx*dx + dy*dy);
-      const min = this.r + b.r + 16;
-      if (d < min && d > 0) {
-        const f = (min - d) / min * 0.06;
-        this.vx += (dx/d)*f;
-        this.vy += (dy/d)*f;
+      const dx   = this.x - b.x;
+      const dy   = this.y - b.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const min  = this.r + b.r + 16;
+      if (dist < min && dist > 0) {
+        const force = (min - dist) / min * 0.06;
+        this.vx += (dx / dist) * force;
+        this.vy += (dy / dist) * force;
       }
     });
   }
 
   draw(t) {
-    const floatY   = Math.sin(this.phase + t * 0.0008) * 5;
-    const r        = this.r * this.scale;
-    const textSize = this.hovered ? Math.round(r * 0.34) : Math.round(r * 0.28);
+    const floatY = Math.sin(this.phase + t * 0.0008) * 5;
+    const r      = this.r * this.scale;
+
     ctx.save();
     ctx.translate(this.x, this.y + floatY);
+
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fillStyle = this.mood.color;
     ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.strokeStyle = this.mood.color;
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+
+    const textSize = this.hovered ? Math.round(r * 0.34) : Math.round(r * 0.28);
     ctx.fillStyle    = '#000000';
     ctx.font         = `${textSize}px 'Space Grotesk', sans-serif`;
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.globalAlpha  = this.scale;
     ctx.fillText(this.mood.label, 0, 4);
+
     ctx.restore();
-  }
+}
 
   contains(mx, my) {
-    const dx = mx - this.x, dy = my - this.y;
+    const dx = mx - this.x;
+    const dy = my - this.y;
     return Math.sqrt(dx*dx + dy*dy) < this.r * 1.15;
   }
 }
 
-/* ── AMBIENT BUBBLE ── */
 class AmbientBubble {
   constructor(idx, total) {
     const angle   = (idx / total) * Math.PI * 2 + Math.PI / 6;
@@ -385,17 +434,20 @@ class AmbientBubble {
     this.r        = 12 + Math.random() * 22;
     this.color    = AMBIENT_COLORS[idx % AMBIENT_COLORS.length];
     this.phase    = Math.random() * Math.PI * 2;
-    this.driftX   = (Math.random() - 0.5) * 0.6;
-    this.driftY   = (Math.random() - 0.5) * 0.6;
+    this.driftX   = (Math.random() - 0.5) * 1.2;
+    this.driftY   = (Math.random() - 0.5) * 1.2;
     this.scale    = 0;
     this.born     = performance.now();
-    this.opacity  = 0.3 + Math.random() * 0.4;
+    this.opacity  = 0.8 + Math.random() * 0.4;
   }
 
   update(t) {
     const age  = (t - this.born) / 600;
     this.scale = Math.min(1, age * age);
-    const spring = 0.04, damp = 0.82;
+
+    const spring = 0.04;
+    const damp   = 0.82;
+
     this.vx += (this.tx - this.x) * spring;
     this.vy += (this.ty - this.y) * spring;
     this.vx *= damp;
@@ -404,6 +456,7 @@ class AmbientBubble {
     this.y  += this.vy;
     this.tx += this.driftX;
     this.ty += this.driftY;
+
     const pad = this.r + 20;
     if (this.tx < pad || this.tx > W - pad) this.driftX *= -1;
     if (this.ty < pad || this.ty > H - pad) this.driftY *= -1;
@@ -412,29 +465,40 @@ class AmbientBubble {
   draw(t) {
     const floatY = Math.sin(this.phase + t * 0.0008) * 4;
     const r      = this.r * this.scale;
+
     ctx.save();
     ctx.translate(this.x, this.y + floatY);
-    ctx.globalAlpha = 0.4 * this.scale;
+
+    // fill opacity
+    ctx.globalAlpha = 0.4 * this.scale;  // ← change this
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
     ctx.fill();
-    ctx.globalAlpha = 0.8 * this.scale;
+
+    // stroke opacity
+    ctx.globalAlpha = 0.8 * this.scale;   // ← change this
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.strokeStyle = this.color;
     ctx.lineWidth   = 1.2;
     ctx.stroke();
+
     ctx.restore();
   }
 }
 
-/* ── MAIN LOOP ── */
+// const NUM_AMBIENT = 18;
+// const ambientBubbles = Array.from({ length: NUM_AMBIENT }, () => new AmbientBubble());
+let ambientBubbles = [];
+
+/* ── MAIN ANIMATION LOOP ────────────────────────────── */
 function loop(t) {
   animFrame = requestAnimationFrame(loop);
   ctx.clearRect(0, 0, W, H);
 
   if (!exploded) {
+    // orb only
     const pulse = Math.sin(t * orb.pulseSpeed * 0.1) * orb.pulseAmp;
     const r     = orb.r + pulse;
     ctx.save();
@@ -462,10 +526,14 @@ function loop(t) {
     return;
   }
 
+  // ambient decorative bubbles (behind mood bubbles)
   ambientBubbles.forEach(b => { b.update(t); b.draw(t); });
+
+  // mood bubbles on top
   bubbles.forEach(b => b.update(t));
   bubbles.forEach(b => b.draw(t));
 
+  // faint centre orb remnant
   const pulse = Math.sin(t * orb.pulseSpeed * 0.1) * (orb.pulseAmp * 0.5);
   const r     = (orb.r * 0.6) + pulse;
   ctx.save();
@@ -478,17 +546,18 @@ function loop(t) {
   ctx.restore();
 }
 
-/* ── EXPLODE / COLLAPSE ── */
+/* ── EXPLODE ─────────────────────────────────────────── */
 function explode() {
   if (exploded) return;
   exploded = true;
   document.getElementById('hint').style.opacity = '0';
-  bubbles        = MOODS.map((mood, i) => new Bubble(mood, i, MOODS.length));
-  ambientBubbles = Array.from({ length: 14 }, (_, i) => new AmbientBubble(i, 14));
+  bubbles         = MOODS.map((mood, i) => new Bubble(mood, i, MOODS.length));
+  ambientBubbles  = Array.from({ length: 14 }, (_, i) => new AmbientBubble(i, 14));
   cancelAnimationFrame(animFrame);
   animFrame = requestAnimationFrame(loop);
 }
 
+/* ── COLLAPSE BACK ───────────────────────────────────── */
 function collapse() {
   exploded       = false;
   bubbles        = [];
@@ -498,9 +567,9 @@ function collapse() {
   animFrame = requestAnimationFrame(loop);
 }
 
-/* ── INPUT ── */
+/* ── MOUSE / TOUCH ───────────────────────────────────── */
 function getPos(e) {
-  const r   = canvas.getBoundingClientRect();
+  const r = canvas.getBoundingClientRect();
   const src = e.touches ? e.touches[0] : e;
   return { x: src.clientX - r.left, y: src.clientY - r.top };
 }
@@ -522,21 +591,24 @@ canvas.addEventListener('mousemove', e => {
   if (!exploded) { canvas.style.cursor = 'pointer'; return; }
   const { x, y } = getPos(e);
   let hit = false;
-  bubbles.forEach(b => { b.hovered = b.contains(x, y); if (b.hovered) hit = true; });
+  bubbles.forEach(b => {
+    b.hovered = b.contains(x, y);
+    if (b.hovered) hit = true;
+  });
   canvas.style.cursor = hit ? 'pointer' : 'default';
 });
 
-/* ── PLAYLIST ── */
+/* ── PLAYLIST LOGIC ──────────────────────────────────── */
 async function triggerMood(mood) {
   currentMood   = mood;
   currentTracks = [];
 
-  const view     = document.getElementById('playlist-view');
-  const title    = document.getElementById('playlist-mood-title');
-  const status   = document.getElementById('status-bar');
-  const list     = document.getElementById('track-list');
-  const saveBtn  = document.getElementById('save-btn');
-  const saveHint = document.getElementById('save-hint');
+  const view  = document.getElementById('playlist-view');
+  const title = document.getElementById('playlist-mood-title');
+  const status= document.getElementById('status-bar');
+  const list  = document.getElementById('track-list');
+  const saveBtn = document.getElementById('save-btn');
+  const saveHint= document.getElementById('save-hint');
 
   title.textContent = mood.label;
   title.style.color = mood.color;
@@ -544,7 +616,6 @@ async function triggerMood(mood) {
   status.innerHTML  = '<span class="spinner-inline"></span>Finding tracks…';
   list.innerHTML    = '';
   saveBtn.disabled  = true;
-  saveHint.innerHTML = '';
   view.classList.add('visible');
 
   try {
@@ -557,38 +628,49 @@ async function triggerMood(mood) {
       return;
     }
 
-    currentTracks     = data.tracks;
-    const cutoff      = Math.ceil(data.tracks.length * 0.8);
+    currentTracks = data.tracks;
+    const cutoff  = Math.ceil(data.tracks.length * 0.8);
 
     list.innerHTML = `
-      <div class="track-row" style="border-bottom:0.5px solid rgba(232,224,208,0.3); margin-bottom:4px;">
-        <div></div>
-        <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:0.12em;color:rgba(232,224,208,0.5);text-transform:uppercase;">Track</div>
-        <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:0.12em;color:rgba(232,224,208,0.5);text-transform:uppercase;text-align:center;">Pop</div>
-        <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:0.12em;color:rgba(232,224,208,0.5);text-transform:uppercase;text-align:center;">Conf</div>
-        <div></div>
+  <div class="track-row" style="border-bottom: 0.5px solid rgba(232,224,208,0.85); margin-bottom: 4px; margin-top: 4px;">
+    <div class="track-num"></div>
+    <div style="font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.12em; color:rgba(232,224,208,0.85); text-transform:uppercase;">Track</div>
+    <div style="font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.12em; color:rgba(232,224,208,0.85); text-transform:uppercase; text-align:center;">Pop</div>
+    <div style="font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.12em; color:rgba(232,224,208,0.85); text-transform:uppercase; text-align:center;">Conf</div>
+    <div></div>
+    <div></div>
+  </div>
+  ${data.tracks.map((t, i) => `
+    <div class="track-row" id="row-${i}"
+         data-track="${encodeURIComponent(t.track_name || '')}"
+         data-artist="${encodeURIComponent((t.artists || '').split(';')[0].trim())}">
+      <div class="track-num">${i + 1}</div>
+      <div class="track-info">
+        <div class="track-name">${esc(t.track_name || '—')}</div>
+        <div class="track-artist">${esc(t.artists ? t.artists.replace(/;/g, ', ') : '—')}</div>
       </div>
-      ${data.tracks.map((t, i) => `
-        <div class="track-row">
-          <div class="track-num">${i + 1}</div>
-          <div class="track-info">
-            <div class="track-name">${esc(t.track_name || '—')}</div>
-            <div class="track-artist">${esc(t.artists ? t.artists.replace(/;/g, ', ') : '—')}</div>
-          </div>
-          <div class="track-pop">${t.popularity || 0}</div>
-          <div class="track-conf">${t.confidence != null ? (t.confidence * 100).toFixed(0) + '%' : '—'}</div>
-          <div>${i < cutoff
-            ? '<span class="badge badge-pop">Popular</span>'
-            : '<span class="badge badge-ml">ML pick</span>'}</div>
-        </div>`).join('')}
-    `;
+      <div class="track-pop">${t.popularity || 0}</div>
+      <div class="track-conf">${t.confidence != null ? (t.confidence * 100).toFixed(0) + '%' : '—'}</div>
+      <div>${i < cutoff
+        ? '<span class="badge badge-pop">Popular</span>'
+        : '<span class="badge badge-ml">ML pick</span>'}</div>
+    </div>`).join('')}
+`;
+
+    // Remove any existing listener first
+const trackList = document.getElementById('track-list');
+const newTrackList = trackList.cloneNode(true);
+trackList.parentNode.replaceChild(newTrackList, trackList);
 
     status.className   = 'success';
-    status.textContent = `${data.count} tracks · 80% popular · 20% ML pick`;
-    saveBtn.disabled   = false;
-    saveHint.innerHTML = `Download the .m3u file, then import it into Spotify via
-      <a href="https://soundiiz.com" target="_blank" rel="noopener">Soundiiz</a>
-      (free) — paste the track list and it creates the Spotify playlist for you.`;
+    status.textContent = `${data.count} tracks — 80% popular · 20% ML pick;`
+
+    if (IS_LOGGED_IN) {
+      saveBtn.disabled    = false;
+      saveHint.textContent= '';
+    } else {
+      saveHint.innerHTML  = '<a href="/login">Connect Spotify</a> to save this playlist';
+    }
 
   } catch (err) {
     status.className   = 'error';
@@ -598,11 +680,12 @@ async function triggerMood(mood) {
 
 async function savePlaylist() {
   const saveBtn  = document.getElementById('save-btn');
+  const saveHint = document.getElementById('save-hint');
   const status   = document.getElementById('status-bar');
 
-  saveBtn.disabled = true;
-  status.className = '';
-  status.innerHTML = '<span class="spinner-inline"></span>Generating file…';
+  saveBtn.disabled  = true;
+  status.className  = '';
+  status.innerHTML  = '<span class="spinner-inline"></span>Generating playlist file…';
 
   try {
     const resp = await fetch('/export', {
@@ -619,16 +702,18 @@ async function savePlaylist() {
       return;
     }
 
-    const blob = await resp.blob();
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `${currentMood.id}_vibes.m3u`;
+    // Trigger file download
+    const blob     = await resp.blob();
+    const url      = URL.createObjectURL(blob);
+    const a        = document.createElement('a');
+    a.href         = url;
+    a.download     = `${currentMood.id}_vibes.m3u`;
     a.click();
     URL.revokeObjectURL(url);
 
     status.className   = 'success';
-    status.textContent = `${currentMood.label} playlist downloaded!`;
+    status.textContent = 'Playlist file downloaded!';
+    saveHint.innerHTML = 'Open the .m3u file to import into Spotify or any music player';
     saveBtn.disabled   = false;
 
   } catch (err) {
@@ -650,6 +735,8 @@ function esc(s) {
 }
 
 animFrame = requestAnimationFrame(loop);
+
+
 </script>
 </body>
 </html>
