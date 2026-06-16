@@ -47,7 +47,7 @@ from playlist_generator import get_playlist_tracks
 
 load_dotenv()  # reads .env into os.environ
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=".")
 app.secret_key = os.getenv("FLASK_SECRET_KEY", secrets.token_hex(32))
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"]   = False
@@ -196,7 +196,7 @@ def _spotify_post(endpoint: str, **kwargs) -> requests.Response:
 def index():
     """Serve the single-page frontend."""
     logged_in = bool(_get_access_token())
-    return render_template("index2.html", logged_in=logged_in)
+    return render_template("index.html", logged_in=logged_in)
 
 
 @app.route("/login")

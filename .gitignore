@@ -1,5 +1,5 @@
 .env
-dataset.csv
+# dataset.csv
 venv/
 __pycache__/
 mood_model.pkl
